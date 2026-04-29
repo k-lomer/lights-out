@@ -6,20 +6,21 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/k-lomer/lights-out/model"
+	"github.com/k-lomer/lights-out/clients"
 )
+
+var client *http.Client = &http.Client{
+	Timeout: 30 * time.Second,
+}
 
 func ListHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("called list handler")
 
-	outages := []model.Outage{
-		{
-			DNO:       "SSE",
-			ID:        "572d85a1-ceb1-4b95-b0fc-0ec1b56fb6ce",
-			Start:     time.Now(),
-			End:       time.Now(),
-			Postcodes: []string{"DT2 0HS", "DT2 9PW"},
-		},
+	outages, err := clients.ListSseOutages(r.Context(), client)
+	if err != nil {
+		log.Printf("error getting SSE outages: %v", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
