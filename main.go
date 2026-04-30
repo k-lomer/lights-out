@@ -16,9 +16,9 @@ var client *http.Client = &http.Client{
 func ListHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("called list handler")
 
-	outages, err := clients.ListSseOutages(r.Context(), client)
+	outages, err := clients.ListNorthernPowergridOutages(r.Context(), client)
 	if err != nil {
-		log.Printf("error getting SSE outages: %v", err)
+		log.Printf("error getting NortherPowergrid outages: %v", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

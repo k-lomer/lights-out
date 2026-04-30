@@ -9,12 +9,12 @@ import (
 	"github.com/k-lomer/lights-out/model"
 )
 
-const apiBaseUrl = "https://ssen-powertrack-api.opcld.com"
-const apiRouteLiveFaults = "/gridiview/reporter/info/livefaults"
+const apiBaseUrlSse = "https://ssen-powertrack-api.opcld.com"
+const apiRouteSseLiveFaults = "/gridiview/reporter/info/livefaults"
 
 func ListSseOutages(ctx context.Context, client *http.Client) ([]model.Outage, error) {
 	req, err := http.NewRequestWithContext(ctx,
-		http.MethodGet, apiBaseUrl+apiRouteLiveFaults, nil)
+		http.MethodGet, apiBaseUrlSse+apiRouteSseLiveFaults, nil)
 	if err != nil {
 		return nil, err
 	}
