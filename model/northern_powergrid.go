@@ -11,10 +11,17 @@ type OptionalNorthernPowergridTime struct {
 	*time.Time
 }
 
-func (onpt *OptionalNorthernPowergridTime) UnmarshalJSON(data []byte) error {
+func (o OptionalNorthernPowergridTime) String() string {
+	if o.Time == nil {
+		return "nil"
+	}
+	return o.Time.String()
+}
+
+func (o *OptionalNorthernPowergridTime) UnmarshalJSON(data []byte) error {
 	s := strings.Trim(string(data), `"`)
 	if s == "1900-01-01T00:00:00" {
-		onpt.Time = nil
+		o.Time = nil
 		return nil
 	}
 
@@ -22,7 +29,7 @@ func (onpt *OptionalNorthernPowergridTime) UnmarshalJSON(data []byte) error {
 	if err != nil {
 		return err
 	}
-	onpt.Time = &parsed
+	o.Time = &parsed
 	return nil
 }
 
