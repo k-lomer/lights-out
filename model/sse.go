@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-const sseTimeLayout = "2006-01-02T15:04:05.000-0700"
+const sseTimeLayout = "2006-01-02T15:04:05.999-0700"
 
 type SseTime struct {
 	time.Time

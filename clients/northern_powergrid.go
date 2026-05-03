@@ -24,7 +24,7 @@ func ListNorthernPowergridOutages(ctx context.Context, client *http.Client) ([]m
 		return nil, err
 	}
 
-	// Extract to SSE model
+	// Extract to Northern Powergrid model
 	defer res.Body.Close()
 	if res.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("unexpected return code from Northern Powergrid, %d", res.StatusCode)
