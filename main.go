@@ -26,7 +26,7 @@ func aggregateOutages(outages *[][]model.Outage) []model.Outage {
 func ListHandler(w http.ResponseWriter, r *http.Request) {
 	var clientResults [][]model.Outage
 	var wg sync.WaitGroup
-	clientProviders := 2
+	clientProviders := 3
 	clientErrors := 0
 	wg.Add(clientProviders)
 
@@ -46,6 +46,17 @@ func ListHandler(w http.ResponseWriter, r *http.Request) {
 		outages, err := clients.ListSseOutages(r.Context(), client)
 		if err != nil {
 			log.Printf("error getting SSE outages: %v", err)
+			clientErrors += 1
+			return
+		}
+		clientResults = append(clientResults, outages)
+	}()
+
+	go func() {
+		defer wg.Done()
+		outages, err := clients.ListUkpnOutages(r.Context(), client)
+		if err != nil {
+			log.Printf("error getting UKPN outages: %v", err)
 			clientErrors += 1
 			return
 		}
