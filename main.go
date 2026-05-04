@@ -26,7 +26,7 @@ func aggregateOutages(outages *[][]model.Outage) []model.Outage {
 func ListHandler(w http.ResponseWriter, r *http.Request) {
 	var clientResults [][]model.Outage
 	var wg sync.WaitGroup
-	clientProviders := 3
+	clientProviders := 4
 	clientErrors := 0
 	wg.Add(clientProviders)
 
@@ -35,6 +35,17 @@ func ListHandler(w http.ResponseWriter, r *http.Request) {
 		outages, err := clients.ListNorthernPowergridOutages(r.Context(), client)
 		if err != nil {
 			log.Printf("error getting NortherPowergrid outages: %v", err)
+			clientErrors += 1
+			return
+		}
+		clientResults = append(clientResults, outages)
+	}()
+
+	go func() {
+		defer wg.Done()
+		outages, err := clients.ListNationalGridDistributionOutages(r.Context(), client)
+		if err != nil {
+			log.Printf("error getting NationalGridDistribution outages: %v", err)
 			clientErrors += 1
 			return
 		}
