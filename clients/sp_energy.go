@@ -57,7 +57,7 @@ func getSPEnergyIncidents(ctx context.Context, client *http.Client, count int) (
 
 	defer res.Body.Close()
 	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected return code from SSE, %d", res.StatusCode)
+		return nil, fmt.Errorf("unexpected return code from SPEnergy, %d", res.StatusCode)
 	}
 	var incidents model.SPEnergyIncidents
 	err = json.NewDecoder(res.Body).Decode(&incidents)
