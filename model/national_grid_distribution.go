@@ -25,7 +25,7 @@ func (o *OptionalNationalGridTime) UnmarshalJSON(data []byte) error {
 		return nil
 	}
 
-	parsed, err := time.Parse(nationalGridTimeLayout, s)
+	parsed, err := time.ParseInLocation(nationalGridTimeLayout, s, ukLocation)
 	if err != nil {
 		return err
 	}

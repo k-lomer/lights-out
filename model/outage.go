@@ -2,6 +2,8 @@ package model
 
 import "time"
 
+var ukLocation, _ = time.LoadLocation("Europe/London")
+
 type Outage struct {
 	DNO       string     `json:"dno"`
 	ID        string     `json:"id"`

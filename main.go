@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -15,6 +16,13 @@ var client *http.Client = &http.Client{
 	Timeout: 30 * time.Second,
 }
 
+var insecureClient *http.Client = &http.Client{
+	Timeout: 30 * time.Second,
+	Transport: &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	},
+}
+
 func aggregateOutages(outages *[][]model.Outage) []model.Outage {
 	var totalOutages []model.Outage
 	for _, r := range *outages {
@@ -26,7 +34,7 @@ func aggregateOutages(outages *[][]model.Outage) []model.Outage {
 func ListHandler(w http.ResponseWriter, r *http.Request) {
 	var clientResults [][]model.Outage
 	var wg sync.WaitGroup
-	clientProviders := 4
+	clientProviders := 5
 	clientErrors := 0
 	wg.Add(clientProviders)
 
@@ -46,6 +54,17 @@ func ListHandler(w http.ResponseWriter, r *http.Request) {
 		outages, err := clients.ListNationalGridDistributionOutages(r.Context(), client)
 		if err != nil {
 			log.Printf("error getting NationalGridDistribution outages: %v", err)
+			clientErrors += 1
+			return
+		}
+		clientResults = append(clientResults, outages)
+	}()
+
+	go func() {
+		defer wg.Done()
+		outages, err := clients.ListSPEnergyOutages(r.Context(), insecureClient)
+		if err != nil {
+			log.Printf("error getting SP Energy outages: %v", err)
 			clientErrors += 1
 			return
 		}

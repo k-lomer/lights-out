@@ -5,8 +5,6 @@ import (
 	"time"
 )
 
-var ukLocation, _ = time.LoadLocation("Europe/London")
-
 const ukpnTimeLayout = "2006-01-02T15:04:05"
 const ukpnTimeLayoutMs = "2006-01-02T15:04:05.999"
 
