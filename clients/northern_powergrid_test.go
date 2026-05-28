@@ -9,10 +9,10 @@ import (
 
 func Test_ListNorthernPowergridOutages(t *testing.T) {
 	ctx := context.Background()
-	var client *http.Client = &http.Client{
+	var client = &http.Client{
 		Timeout: 30 * time.Second,
 	}
-	res, err := ListNorthernPowergridOutages(ctx, client)
+	res, err := MakeNorthernPowergridClient(client).ListOutages(ctx)
 	if err != nil {
 		t.Error(err)
 	}

@@ -9,10 +9,10 @@ import (
 
 func Test_ListUkpnOutages(t *testing.T) {
 	ctx := context.Background()
-	var client *http.Client = &http.Client{
+	var client = &http.Client{
 		Timeout: 30 * time.Second,
 	}
-	_, err := ListUkpnOutages(ctx, client)
+	_, err := MakeUKPowerNetworkClient(client).ListOutages(ctx)
 	if err != nil {
 		t.Error(err)
 	}

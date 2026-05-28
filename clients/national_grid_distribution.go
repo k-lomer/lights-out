@@ -12,20 +12,30 @@ import (
 const apiBaseUrlNationalGridDistribution = "https://powercuts.nationalgrid.co.uk"
 const apiRouteNationalGridDistribution = "/__powercuts/getTabularView"
 
-func ListNationalGridDistributionOutages(ctx context.Context, client *http.Client) ([]model.Outage, error) {
+type NationalGridDistributionClient struct {
+	httpClient *http.Client
+}
+
+func MakeNationalGridDistributionClient(client *http.Client) NationalGridDistributionClient {
+	return NationalGridDistributionClient{
+		httpClient: client,
+	}
+}
+
+func (client NationalGridDistributionClient) ListOutages(ctx context.Context) ([]model.Outage, error) {
 	req, err := http.NewRequestWithContext(ctx,
 		http.MethodGet, apiBaseUrlNationalGridDistribution+apiRouteNationalGridDistribution, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	res, err := client.Do(req)
+	res, err := client.httpClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
 
 	// Extract to National Grid Distribution model
-	defer res.Body.Close()
+	defer drainAndClose(res.Body)
 	if res.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("unexpected return code from NationalGridDistribution, %d", res.StatusCode)
 	}

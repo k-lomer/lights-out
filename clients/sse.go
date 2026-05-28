@@ -12,20 +12,30 @@ import (
 const apiBaseUrlSse = "https://ssen-powertrack-api.opcld.com"
 const apiRouteSseLiveFaults = "/gridiview/reporter/info/livefaults"
 
-func ListSseOutages(ctx context.Context, client *http.Client) ([]model.Outage, error) {
+type SseClient struct {
+	httpClient *http.Client
+}
+
+func MakeSseClient(client *http.Client) SseClient {
+	return SseClient{
+		httpClient: client,
+	}
+}
+
+func (client SseClient) ListOutages(ctx context.Context) ([]model.Outage, error) {
 	req, err := http.NewRequestWithContext(ctx,
 		http.MethodGet, apiBaseUrlSse+apiRouteSseLiveFaults, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	res, err := client.Do(req)
+	res, err := client.httpClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
 
 	// Extract to SSE model
-	defer res.Body.Close()
+	defer drainAndClose(res.Body)
 	if res.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("unexpected return code from SSE, %d", res.StatusCode)
 	}

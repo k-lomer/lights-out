@@ -13,7 +13,37 @@ import (
 const apiBaseUrlEnergyNorthWest = "https://www.enwl.co.uk"
 const apiRouteEnergyNorthWest = "/api/power-outages/search"
 
-func getEnergyNorthWestOutages(ctx context.Context, client *http.Client, pageSize int) (*model.EnergyNorthWestOutages, error) {
+type EnergyNorthWestClient struct {
+	httpClient *http.Client
+	pageSize   int
+}
+
+func MakeEnergyNorthWestClient(client *http.Client) EnergyNorthWestClient {
+	return EnergyNorthWestClient{
+		httpClient: client,
+		pageSize:   200, // Default value
+	}
+}
+
+func (client EnergyNorthWestClient) ListOutages(ctx context.Context) ([]model.Outage, error) {
+	outages, err := client.getOutages(ctx, client.pageSize)
+	if err != nil {
+		return nil, err
+	}
+	if outages.TotalOutages > client.pageSize {
+		// Larger page size required, get all reported plus a small buffer to be safe.
+		pageBufferSize := 10
+		outages, err = client.getOutages(ctx, outages.TotalOutages+pageBufferSize)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return outages.ToOutages(), nil
+
+}
+
+func (client EnergyNorthWestClient) getOutages(ctx context.Context, pageSize int) (*model.EnergyNorthWestOutages, error) {
 	req, err := http.NewRequestWithContext(ctx,
 		http.MethodPost, apiBaseUrlEnergyNorthWest+apiRouteEnergyNorthWest, nil)
 	if err != nil {
@@ -31,12 +61,13 @@ func getEnergyNorthWestOutages(ctx context.Context, client *http.Client, pageSiz
 	q.Add("includeCancelledPlanned", "false")
 	req.URL.RawQuery = q.Encode()
 
-	res, err := client.Do(req)
+	res, err := client.httpClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
 
-	defer res.Body.Close()
+	// Extract to Energy North West model
+	defer drainAndClose(res.Body)
 	if res.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("unexpected return code from EnergyNorthWest, %d", res.StatusCode)
 	}
@@ -47,22 +78,4 @@ func getEnergyNorthWestOutages(ctx context.Context, client *http.Client, pageSiz
 	}
 
 	return &outages, nil
-}
-
-func ListEnergyNorthWestOutages(ctx context.Context, client *http.Client) ([]model.Outage, error) {
-	pageSize := 200
-	outages, err := getEnergyNorthWestOutages(ctx, client, pageSize)
-	if err != nil {
-		return nil, err
-	}
-	if outages.TotalOutages > pageSize {
-		// Larger page size required, get all reported plus a small buffer to be safe.
-		pageBufferSize := 10
-		outages, err = getEnergyNorthWestOutages(ctx, client, outages.TotalOutages+pageBufferSize)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	return outages.ToOutages(), nil
 }

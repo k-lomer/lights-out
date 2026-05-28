@@ -12,20 +12,30 @@ import (
 const apiBaseUrlNorthernPowergrid = "https://power.northernpowergrid.com"
 const apiRoutePowercutsNorthernPowergrid = "/Powercut_API/rest/powercuts/getall"
 
-func ListNorthernPowergridOutages(ctx context.Context, client *http.Client) ([]model.Outage, error) {
+type NorthernPowergridClient struct {
+	httpClient *http.Client
+}
+
+func MakeNorthernPowergridClient(client *http.Client) NorthernPowergridClient {
+	return NorthernPowergridClient{
+		httpClient: client,
+	}
+}
+
+func (client NorthernPowergridClient) ListOutages(ctx context.Context) ([]model.Outage, error) {
 	req, err := http.NewRequestWithContext(ctx,
 		http.MethodGet, apiBaseUrlNorthernPowergrid+apiRoutePowercutsNorthernPowergrid, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	res, err := client.Do(req)
+	res, err := client.httpClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
 
 	// Extract to Northern Powergrid model
-	defer res.Body.Close()
+	defer drainAndClose(res.Body)
 	if res.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("unexpected return code from Northern Powergrid, %d", res.StatusCode)
 	}

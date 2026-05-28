@@ -14,7 +14,17 @@ import (
 const apiBaseUrlSPEnergy = "https://powercuts.spenergynetworks.co.uk"
 const apiRouteSPEnergyExecute = "/webruntime/api/apex/execute?language=en-US&asGuest=true&htmlEncode=false"
 
-func getSPEnergyIncidentCount(ctx context.Context, client *http.Client) (int, error) {
+type SPEnergyClient struct {
+	httpClient *http.Client
+}
+
+func MakeSPEnergyClient(client *http.Client) SPEnergyClient {
+	return SPEnergyClient{
+		httpClient: client,
+	}
+}
+
+func (client SPEnergyClient) getIncidentCount(ctx context.Context) (int, error) {
 	body := `{"namespace":"","classname":"@udd/01pSr000002yGTp","method":"getImpactDataCount","isContinuation":false,"params":{"postcode":"","statuses":[]},"cacheable":false}`
 	req, err := http.NewRequestWithContext(ctx,
 		http.MethodPost, apiBaseUrlSPEnergy+apiRouteSPEnergyExecute, strings.NewReader(body))
@@ -22,12 +32,13 @@ func getSPEnergyIncidentCount(ctx context.Context, client *http.Client) (int, er
 		return 0, err
 	}
 
-	res, err := client.Do(req)
+	res, err := client.httpClient.Do(req)
 	if err != nil {
 		return 0, err
 	}
 
-	defer res.Body.Close()
+	// Extract to SP Energy model
+	defer drainAndClose(res.Body)
 	if res.StatusCode != http.StatusOK {
 		return 0, fmt.Errorf("unexpected return code from SSE, %d", res.StatusCode)
 	}
@@ -42,7 +53,7 @@ func getSPEnergyIncidentCount(ctx context.Context, client *http.Client) (int, er
 	return result.Count, nil
 }
 
-func getSPEnergyIncidents(ctx context.Context, client *http.Client, count int) (*model.SPEnergyIncidents, error) {
+func (client SPEnergyClient) getIncidents(ctx context.Context, count int) (*model.SPEnergyIncidents, error) {
 	body := `{"namespace":"","classname":"@udd/01pSr000002yGTp","method":"getImpactData","isContinuation":false,"params":{"paramsJson":"{\"postcode\":\"\",\"pageNumber\":1,\"pageSize\":` + strconv.Itoa(count) + `,\"statuses\":[]}"},"cacheable":false}`
 	req, err := http.NewRequestWithContext(ctx,
 		http.MethodPost, apiBaseUrlSPEnergy+apiRouteSPEnergyExecute, strings.NewReader(body))
@@ -50,12 +61,12 @@ func getSPEnergyIncidents(ctx context.Context, client *http.Client, count int) (
 		return nil, err
 	}
 
-	res, err := client.Do(req)
+	res, err := client.httpClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
 
-	defer res.Body.Close()
+	defer drainAndClose(res.Body)
 	if res.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("unexpected return code from SPEnergy, %d", res.StatusCode)
 	}
@@ -68,14 +79,14 @@ func getSPEnergyIncidents(ctx context.Context, client *http.Client, count int) (
 	return &incidents, nil
 }
 
-func ListSPEnergyOutages(ctx context.Context, client *http.Client) ([]model.Outage, error) {
+func (client SPEnergyClient) ListOutages(ctx context.Context) ([]model.Outage, error) {
 
-	count, err := getSPEnergyIncidentCount(ctx, client)
+	count, err := client.getIncidentCount(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	incidents, err := getSPEnergyIncidents(ctx, client, count)
+	incidents, err := client.getIncidents(ctx, count)
 	if err != nil {
 		return nil, err
 	}

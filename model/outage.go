@@ -11,3 +11,11 @@ type Outage struct {
 	End       *time.Time `json:"end_time"`
 	Postcodes []string   `json:"postcodes"`
 }
+
+func AggregateOutages(outages *[][]Outage) []Outage {
+	var totalOutages []Outage
+	for _, r := range *outages {
+		totalOutages = append(totalOutages, r...)
+	}
+	return totalOutages
+}

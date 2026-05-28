@@ -1,127 +1,16 @@
 package main
 
 import (
-	"crypto/tls"
-	"encoding/json"
 	"log"
 	"net/http"
-	"sync"
 	"time"
 
-	"github.com/k-lomer/lights-out/clients"
-	"github.com/k-lomer/lights-out/model"
+	"github.com/k-lomer/lights-out/handlers"
 )
-
-var client *http.Client = &http.Client{
-	Timeout: 30 * time.Second,
-}
-
-var insecureClient *http.Client = &http.Client{
-	Timeout: 30 * time.Second,
-	Transport: &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	},
-}
-
-func aggregateOutages(outages *[][]model.Outage) []model.Outage {
-	var totalOutages []model.Outage
-	for _, r := range *outages {
-		totalOutages = append(totalOutages, r...)
-	}
-	return totalOutages
-}
-
-func ListHandler(w http.ResponseWriter, r *http.Request) {
-	var clientResults [][]model.Outage
-	var wg sync.WaitGroup
-	clientProviders := 6
-	clientErrors := 0
-	wg.Add(clientProviders)
-
-	go func() {
-		defer wg.Done()
-		outages, err := clients.ListEnergyNorthWestOutages(r.Context(), client)
-		if err != nil {
-			log.Printf("error getting EnergyNorthWest outages: %v", err)
-			clientErrors += 1
-			return
-		}
-		clientResults = append(clientResults, outages)
-	}()
-
-	go func() {
-		defer wg.Done()
-		outages, err := clients.ListNorthernPowergridOutages(r.Context(), client)
-		if err != nil {
-			log.Printf("error getting NortherPowergrid outages: %v", err)
-			clientErrors += 1
-			return
-		}
-		clientResults = append(clientResults, outages)
-	}()
-
-	go func() {
-		defer wg.Done()
-		outages, err := clients.ListNationalGridDistributionOutages(r.Context(), client)
-		if err != nil {
-			log.Printf("error getting NationalGridDistribution outages: %v", err)
-			clientErrors += 1
-			return
-		}
-		clientResults = append(clientResults, outages)
-	}()
-
-	go func() {
-		defer wg.Done()
-		outages, err := clients.ListSPEnergyOutages(r.Context(), insecureClient)
-		if err != nil {
-			log.Printf("error getting SP Energy outages: %v", err)
-			clientErrors += 1
-			return
-		}
-		clientResults = append(clientResults, outages)
-	}()
-
-	go func() {
-		defer wg.Done()
-		outages, err := clients.ListSseOutages(r.Context(), client)
-		if err != nil {
-			log.Printf("error getting SSE outages: %v", err)
-			clientErrors += 1
-			return
-		}
-		clientResults = append(clientResults, outages)
-	}()
-
-	go func() {
-		defer wg.Done()
-		outages, err := clients.ListUkpnOutages(r.Context(), client)
-		if err != nil {
-			log.Printf("error getting UKPN outages: %v", err)
-			clientErrors += 1
-			return
-		}
-		clientResults = append(clientResults, outages)
-	}()
-
-	wg.Wait()
-
-	if clientErrors == clientProviders {
-		http.Error(w, "all DNO clients failed", http.StatusInternalServerError)
-		return
-	}
-
-	totalOutages := aggregateOutages(&clientResults)
-
-	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(totalOutages); err != nil {
-		log.Printf("error encoding outages: %v", err)
-	}
-}
 
 func main() {
 	mux := http.NewServeMux()
-	mux.HandleFunc("GET /list", ListHandler)
+	mux.HandleFunc("GET /list", handlers.ListHandler)
 	s := http.Server{
 		Addr:         ":8080",
 		Handler:      mux,

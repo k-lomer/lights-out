@@ -9,10 +9,10 @@ import (
 
 func Test_ListNationalGridDistributionOutages(t *testing.T) {
 	ctx := context.Background()
-	var client *http.Client = &http.Client{
+	var client = &http.Client{
 		Timeout: 30 * time.Second,
 	}
-	res, err := ListNationalGridDistributionOutages(ctx, client)
+	res, err := MakeNationalGridDistributionClient(client).ListOutages(ctx)
 	if err != nil {
 		t.Error(err)
 	}
