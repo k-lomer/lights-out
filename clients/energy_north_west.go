@@ -25,6 +25,10 @@ func MakeEnergyNorthWestClient(client *http.Client) EnergyNorthWestClient {
 	}
 }
 
+func (client EnergyNorthWestClient) GetDno() model.Dno {
+	return model.DnoEnergyNorthWest
+}
+
 func (client EnergyNorthWestClient) ListOutages(ctx context.Context) ([]model.Outage, error) {
 	outages, err := client.getOutages(ctx, client.pageSize)
 	if err != nil {

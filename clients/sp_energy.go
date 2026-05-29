@@ -24,6 +24,10 @@ func MakeSPEnergyClient(client *http.Client) SPEnergyClient {
 	}
 }
 
+func (client SPEnergyClient) GetDno() model.Dno {
+	return model.DnoSPEnergy
+}
+
 func (client SPEnergyClient) getIncidentCount(ctx context.Context) (int, error) {
 	body := `{"namespace":"","classname":"@udd/01pSr000002yGTp","method":"getImpactDataCount","isContinuation":false,"params":{"postcode":"","statuses":[]},"cacheable":false}`
 	req, err := http.NewRequestWithContext(ctx,

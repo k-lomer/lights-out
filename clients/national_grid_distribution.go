@@ -22,6 +22,10 @@ func MakeNationalGridDistributionClient(client *http.Client) NationalGridDistrib
 	}
 }
 
+func (client NationalGridDistributionClient) GetDno() model.Dno {
+	return model.DnoNationalGridDistribution
+}
+
 func (client NationalGridDistributionClient) ListOutages(ctx context.Context) ([]model.Outage, error) {
 	req, err := http.NewRequestWithContext(ctx,
 		http.MethodGet, apiBaseUrlNationalGridDistribution+apiRouteNationalGridDistribution, nil)

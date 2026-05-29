@@ -42,7 +42,7 @@ func ListHandler(w http.ResponseWriter, r *http.Request) {
 			defer wg.Done()
 			outages, err := client.ListOutages(r.Context())
 			if err != nil {
-				log.Printf("error getting outages: %v", err)
+				log.Printf("error getting outages for %s: %v", client.GetDno(), err)
 				clientErrors += 1
 				return
 			}

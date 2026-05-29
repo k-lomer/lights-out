@@ -22,6 +22,10 @@ func MakeSseClient(client *http.Client) SseClient {
 	}
 }
 
+func (client SseClient) GetDno() model.Dno {
+	return model.DnoSse
+}
+
 func (client SseClient) ListOutages(ctx context.Context) ([]model.Outage, error) {
 	req, err := http.NewRequestWithContext(ctx,
 		http.MethodGet, apiBaseUrlSse+apiRouteSseLiveFaults, nil)

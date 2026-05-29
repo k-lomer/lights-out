@@ -22,6 +22,10 @@ func MakeUKPowerNetworkClient(client *http.Client) UKPowerNetworkClient {
 	}
 }
 
+func (client UKPowerNetworkClient) GetDno() model.Dno {
+	return model.DnoUKPowerNetwork
+}
+
 func (client UKPowerNetworkClient) ListOutages(ctx context.Context) ([]model.Outage, error) {
 	req, err := http.NewRequestWithContext(ctx,
 		http.MethodGet, apiBaseUrlUkpn+apiRouteUkpnIncidents, nil)

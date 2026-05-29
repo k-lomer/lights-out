@@ -22,6 +22,10 @@ func MakeNorthernPowergridClient(client *http.Client) NorthernPowergridClient {
 	}
 }
 
+func (client NorthernPowergridClient) GetDno() model.Dno {
+	return model.DnoNorthernPowergrid
+}
+
 func (client NorthernPowergridClient) ListOutages(ctx context.Context) ([]model.Outage, error) {
 	req, err := http.NewRequestWithContext(ctx,
 		http.MethodGet, apiBaseUrlNorthernPowergrid+apiRoutePowercutsNorthernPowergrid, nil)

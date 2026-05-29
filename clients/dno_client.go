@@ -9,6 +9,7 @@ import (
 
 type DnoClient interface {
 	ListOutages(ctx context.Context) ([]model.Outage, error)
+	GetDno() model.Dno
 }
 
 func drainAndClose(body io.ReadCloser) {
