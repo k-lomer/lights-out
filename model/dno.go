@@ -10,3 +10,12 @@ const (
 	DnoSse                      Dno = "SSE"
 	DnoUKPowerNetwork           Dno = "UKPowerNetwork"
 )
+
+var AllDnoList = [6]Dno{
+	DnoEnergyNorthWest,
+	DnoNationalGridDistribution,
+	DnoNorthernPowergrid,
+	DnoSPEnergy,
+	DnoSse,
+	DnoUKPowerNetwork,
+}

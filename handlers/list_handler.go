@@ -1,8 +1,10 @@
 package handlers
 
 import (
+	"context"
 	"crypto/tls"
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 	"sync"
@@ -23,7 +25,7 @@ var insecureClient *http.Client = &http.Client{
 	},
 }
 
-func ListHandler(w http.ResponseWriter, r *http.Request) {
+func GetOutages(ctx context.Context) ([]model.Outage, error) {
 	var clientResults [][]model.Outage
 	var wg sync.WaitGroup
 	var clients = []clients.DnoClient{
@@ -40,7 +42,7 @@ func ListHandler(w http.ResponseWriter, r *http.Request) {
 	for _, client := range clients {
 		go func() {
 			defer wg.Done()
-			outages, err := client.ListOutages(r.Context())
+			outages, err := client.ListOutages(ctx)
 			if err != nil {
 				log.Printf("error getting outages for %s: %v", client.GetDno(), err)
 				clientErrors += 1
@@ -53,14 +55,23 @@ func ListHandler(w http.ResponseWriter, r *http.Request) {
 	wg.Wait()
 
 	if clientErrors == len(clients) {
-		http.Error(w, "all DNO clients failed", http.StatusInternalServerError)
-		return
+		return nil, errors.New("all DNO clients failed")
 	}
 
 	totalOutages := model.AggregateOutages(&clientResults)
+	return totalOutages, nil
+}
+
+func ListHandler(w http.ResponseWriter, r *http.Request) {
+	outages, err := GetOutages(r.Context())
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(totalOutages); err != nil {
+	if err := json.NewEncoder(w).Encode(outages); err != nil {
 		log.Printf("error encoding outages: %v", err)
 	}
 }
