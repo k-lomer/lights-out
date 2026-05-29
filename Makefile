@@ -1,9 +1,9 @@
 .PHONY: all build run fmt vet lint test clean
 all: fmt vet lint test build
 build:
-	go build -o bin/lights-out .
+	go build -o bin/lights-out ./cmd
 run:
-	go run .
+	go run ./cmd
 fmt:
 	go fmt ./...
 vet:
