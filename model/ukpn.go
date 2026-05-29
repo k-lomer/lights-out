@@ -52,7 +52,7 @@ func (ukpni UKPowerNetworkIncident) ToOutage() Outage {
 		endTime = &ukpni.Estimated.Time
 	}
 	return Outage{
-		DNO:       "UKPowerNetwork",
+		DNO:       DnoUKPowerNetwork,
 		ID:        ukpni.ID,
 		Start:     ukpni.Start.Time,
 		End:       endTime,

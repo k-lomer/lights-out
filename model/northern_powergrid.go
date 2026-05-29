@@ -42,7 +42,7 @@ type NorthernPowergridPowercut struct {
 
 func (npp NorthernPowergridPowercut) ToOutage() Outage {
 	return Outage{
-		DNO:       "NorthernPowergrid",
+		DNO:       DnoNorthernPowergrid,
 		ID:        npp.ID,
 		Start:     npp.Start,
 		End:       npp.End.Time,

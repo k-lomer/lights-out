@@ -73,7 +73,7 @@ func (spei SPEnergyIncident) ToOutage() Outage {
 		end = &spei.EstimatedEnd.Time
 	}
 	return Outage{
-		DNO:       "SPEnergy",
+		DNO:       DnoSPEnergy,
 		ID:        spei.ID,
 		Start:     spei.Start.Time,
 		End:       end,

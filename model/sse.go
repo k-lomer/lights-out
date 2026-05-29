@@ -34,7 +34,7 @@ type SseFault struct {
 
 func (sf SseFault) ToOutage() Outage {
 	return Outage{
-		DNO:       "SSE",
+		DNO:       DnoSse,
 		ID:        sf.ID,
 		Start:     sf.Start.Time,
 		End:       &sf.End.Time,

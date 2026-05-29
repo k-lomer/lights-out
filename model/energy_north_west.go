@@ -54,7 +54,7 @@ func (enw EnergyNorthWestOutage) ToOutage() Outage {
 	}
 
 	return Outage{
-		DNO:       "EnergyNorthWest",
+		DNO:       DnoEnergyNorthWest,
 		ID:        enw.ID,
 		Start:     enw.Start.Time,
 		End:       end,

@@ -47,7 +47,7 @@ type NationalGridPowercut struct {
 func (ngp NationalGridPowercut) ToOutage() Outage {
 
 	return Outage{
-		DNO:       "NationalGridDistribution",
+		DNO:       DnoNationalGridDistribution,
 		ID:        ngp.ID,
 		Start:     *ngp.Start.Time,
 		End:       ngp.End.Time,
