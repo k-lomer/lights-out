@@ -13,7 +13,8 @@ func Test_ListHandler_Basic(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/list", nil)
 	res := httptest.NewRecorder()
 
-	ListHandler(res, req)
+	lh := NewListHandler(NewTestDnoClients())
+	lh.ServeHTTP(res, req)
 
 	assertStatus(t, res.Code, http.StatusOK)
 	outages := decodeOutages(t, res.Body)
@@ -26,7 +27,8 @@ func Test_ListHandler_PageSize(t *testing.T) {
 	addQueryParams(req, "pageSize", "2")
 	res := httptest.NewRecorder()
 
-	ListHandler(res, req)
+	lh := NewListHandler(NewTestDnoClients())
+	lh.ServeHTTP(res, req)
 
 	assertStatus(t, res.Code, http.StatusOK)
 	outages := decodeOutages(t, res.Body)
@@ -39,7 +41,8 @@ func Test_ListHandler_PageIndex(t *testing.T) {
 	addQueryParams(req, "pageIndex", "0")
 	res := httptest.NewRecorder()
 
-	ListHandler(res, req)
+	lh := NewListHandler(NewTestDnoClients())
+	lh.ServeHTTP(res, req)
 
 	assertStatus(t, res.Code, http.StatusOK)
 	outages1 := decodeOutages(t, res.Body)
@@ -48,7 +51,7 @@ func Test_ListHandler_PageIndex(t *testing.T) {
 	addQueryParams(req, "pageIndex", "1")
 	res = httptest.NewRecorder()
 
-	ListHandler(res, req)
+	lh.ServeHTTP(res, req)
 
 	assertStatus(t, res.Code, http.StatusOK)
 	outages2 := decodeOutages(t, res.Body)
@@ -65,7 +68,8 @@ func Test_ListHandler_AllOutages(t *testing.T) {
 	addQueryParams(req, "pageSize", "0")
 	res := httptest.NewRecorder()
 
-	ListHandler(res, req)
+	lh := NewListHandler(NewTestDnoClients())
+	lh.ServeHTTP(res, req)
 
 	assertStatus(t, res.Code, http.StatusOK)
 	outages := decodeOutages(t, res.Body)

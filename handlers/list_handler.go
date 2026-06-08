@@ -2,45 +2,35 @@ package handlers
 
 import (
 	"context"
-	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"log"
 	"net/http"
 	"slices"
 	"sync"
-	"time"
 
 	"github.com/k-lomer/lights-out/clients"
 	"github.com/k-lomer/lights-out/model"
 )
 
-var client *http.Client = &http.Client{
-	Timeout: 30 * time.Second,
+type ListHandler struct {
+	dnoClients map[model.Dno]clients.DnoClient
 }
 
-var insecureClient *http.Client = &http.Client{
-	Timeout: 30 * time.Second,
-	Transport: &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	},
+func NewListHandler(dnoClients map[model.Dno]clients.DnoClient) ListHandler {
+	return ListHandler{
+		dnoClients,
+	}
 }
 
-func GetOutages(ctx context.Context, qp model.QueryParams) ([]model.Outage, error) {
+func (lh ListHandler) getOutages(ctx context.Context, qp model.QueryParams) ([]model.Outage, error) {
 	var dnoOutages [][]model.Outage
 	var wg sync.WaitGroup
-	var dnoClients = []clients.DnoClient{
-		clients.MakeEnergyNorthWestClient(client),
-		clients.MakeNationalGridDistributionClient(client),
-		clients.MakeNorthernPowergridClient(client),
-		clients.MakeSPEnergyClient(insecureClient),
-		clients.MakeSseClient(client),
-		clients.MakeUKPowerNetworkClient(client),
-	}
-	clientErrors := 0
-	wg.Add(len(dnoClients))
 
-	for _, client := range dnoClients {
+	clientErrors := 0
+	wg.Add(len(lh.dnoClients))
+
+	for _, client := range lh.dnoClients {
 		go func() {
 			defer wg.Done()
 			outages, err := client.ListOutages(ctx)
@@ -55,7 +45,7 @@ func GetOutages(ctx context.Context, qp model.QueryParams) ([]model.Outage, erro
 
 	wg.Wait()
 
-	if clientErrors == len(dnoClients) {
+	if clientErrors == len(lh.dnoClients) {
 		return nil, errors.New("all DNO clients failed")
 	}
 
@@ -75,14 +65,14 @@ func GetOutages(ctx context.Context, qp model.QueryParams) ([]model.Outage, erro
 	return pageOutages, nil
 }
 
-func ListHandler(w http.ResponseWriter, r *http.Request) {
+func (lh ListHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	qp, err := model.ParseQueryParams(r.URL.Query())
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	outages, err := GetOutages(r.Context(), qp)
+	outages, err := lh.getOutages(r.Context(), qp)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

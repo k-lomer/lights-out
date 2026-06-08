@@ -25,7 +25,7 @@ func ParseQueryParams(values url.Values) (QueryParams, error) {
 	if pageSize != "" {
 		i, err := strconv.ParseUint(pageSize, 10, 0)
 		if err != nil {
-			return qp, fmt.Errorf("Failed to parse pageSize '%s': %v", pageSize, err)
+			return qp, fmt.Errorf("failed to parse pageSize '%s': %v", pageSize, err)
 		} else {
 			qp.PageSize = uint(i)
 		}
@@ -35,7 +35,7 @@ func ParseQueryParams(values url.Values) (QueryParams, error) {
 	if pageIndex != "" {
 		i, err := strconv.ParseUint(pageIndex, 10, 0)
 		if err != nil {
-			return qp, fmt.Errorf("Failed to parse pageIndex '%s': %v", pageIndex, err)
+			return qp, fmt.Errorf("failed to parse pageIndex '%s': %v", pageIndex, err)
 		} else {
 			qp.PageIndex = uint(i)
 		}
