@@ -1,6 +1,7 @@
 package model
 
 import (
+	"cmp"
 	"net/url"
 	"time"
 )
@@ -25,4 +26,8 @@ func AggregateOutages(outages *[][]Outage) []Outage {
 		totalOutages = append(totalOutages, r...)
 	}
 	return totalOutages
+}
+
+func KeyComp(o1, o2 Outage) int {
+	return cmp.Compare(o1.GetKey(), o2.GetKey())
 }

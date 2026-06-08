@@ -3,6 +3,7 @@ package handlers
 import (
 	"bytes"
 	"encoding/json"
+	"net/http"
 	"testing"
 
 	"github.com/k-lomer/lights-out/model"
@@ -35,4 +36,10 @@ func checkDnoOutages(t *testing.T, outages []model.Outage) {
 			t.Errorf("Got no outages for %s", dno)
 		}
 	}
+}
+
+func addQueryParams(req *http.Request, k string, v string) {
+	q := req.URL.Query()
+	q.Add(k, v)
+	req.URL.RawQuery = q.Encode()
 }
