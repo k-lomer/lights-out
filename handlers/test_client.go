@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 	"time"
 
@@ -29,12 +30,14 @@ func (t TestDnoClient) ListOutages(ctx context.Context) ([]model.Outage, error) 
 	outages := make([]model.Outage, 0, t.NumOutages)
 	for i := range t.NumOutages {
 		end := time.Now().Add(24 * time.Hour)
+		p, _ := model.NewPostcode(fmt.Sprintf("N%d %dAA", i%100, i%10))
+		postcodes := []model.Postcode{p}
 		o := model.Outage{
 			DNO:       t.Dno,
 			ID:        strconv.Itoa(i),
 			Start:     time.Now(),
 			End:       &end,
-			Postcodes: []string{"WC2N 5EH"},
+			Postcodes: postcodes,
 		}
 		outages = append(outages, o)
 	}

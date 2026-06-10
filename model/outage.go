@@ -13,7 +13,7 @@ type Outage struct {
 	ID        string     `json:"id"`
 	Start     time.Time  `json:"start_time"`
 	End       *time.Time `json:"end_time"`
-	Postcodes []string   `json:"postcodes"`
+	Postcodes Postcodes  `json:"postcodes"`
 }
 
 func (o Outage) GetKey() string {

@@ -38,7 +38,7 @@ func (sf SseFault) ToOutage() Outage {
 		ID:        sf.ID,
 		Start:     sf.Start.Time,
 		End:       &sf.End.Time,
-		Postcodes: sf.Postcodes,
+		Postcodes: ParsePostcodes(sf.Postcodes),
 	}
 }
 

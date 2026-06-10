@@ -22,27 +22,17 @@ func (t *EnergyNorthWestTime) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-type EnergyNorthWestPostcodes struct {
-	postcodes []string
-}
-
-func (p *EnergyNorthWestPostcodes) UnmarshalJSON(data []byte) error {
-	s := strings.Trim(string(data), ` "`)
-	p.postcodes = strings.Split(s, ", ")
-	return nil
-}
-
 type EnergyNorthWestOutages struct {
 	Outages      []EnergyNorthWestOutage `json:"Items"`
 	TotalOutages int                     `json:"TotalResults"`
 }
 
 type EnergyNorthWestOutage struct {
-	ID           string                   `json:"faultNumber"`
-	Start        EnergyNorthWestTime      `json:"date"`
-	EstimatedEnd *EnergyNorthWestTime     `json:"estimatedTimeOfRestoration"`
-	ActualEnd    *EnergyNorthWestTime     `json:"actualTimeOfRestoration"`
-	Postcodes    EnergyNorthWestPostcodes `json:"AffectedPostcodes"`
+	ID           string               `json:"faultNumber"`
+	Start        EnergyNorthWestTime  `json:"date"`
+	EstimatedEnd *EnergyNorthWestTime `json:"estimatedTimeOfRestoration"`
+	ActualEnd    *EnergyNorthWestTime `json:"actualTimeOfRestoration"`
+	Postcodes    Postcodes            `json:"AffectedPostcodes"`
 }
 
 func (enw EnergyNorthWestOutage) ToOutage() Outage {
@@ -58,7 +48,7 @@ func (enw EnergyNorthWestOutage) ToOutage() Outage {
 		ID:        enw.ID,
 		Start:     enw.Start.Time,
 		End:       end,
-		Postcodes: enw.Postcodes.postcodes,
+		Postcodes: enw.Postcodes,
 	}
 }
 

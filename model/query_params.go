@@ -9,12 +9,14 @@ import (
 type QueryParams struct {
 	PageSize  uint
 	PageIndex uint
+	Postcodes []string
 }
 
 func MakeDefaultQueryParams() QueryParams {
 	return QueryParams{
 		PageSize:  10,
 		PageIndex: 0,
+		Postcodes: []string{},
 	}
 }
 

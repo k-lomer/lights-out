@@ -51,12 +51,13 @@ func (ukpni UKPowerNetworkIncident) ToOutage() Outage {
 	} else if ukpni.Estimated != nil {
 		endTime = &ukpni.Estimated.Time
 	}
+
 	return Outage{
 		DNO:       DnoUKPowerNetwork,
 		ID:        ukpni.ID,
 		Start:     ukpni.Start.Time,
 		End:       endTime,
-		Postcodes: ukpni.Postcodes,
+		Postcodes: ParsePostcodes(ukpni.Postcodes),
 	}
 }
 

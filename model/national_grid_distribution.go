@@ -41,7 +41,7 @@ type NationalGridPowercut struct {
 	ID        string                   `json:"id"`
 	Start     OptionalNationalGridTime `json:"startTime"`
 	End       OptionalNationalGridTime `json:"etr"`
-	Postcodes []string                 `json:"postcodes"`
+	Postcodes Postcodes                `json:"postcodes"`
 }
 
 func (ngp NationalGridPowercut) ToOutage() Outage {

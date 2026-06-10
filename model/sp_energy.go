@@ -18,10 +18,6 @@ type SPEnergyEndTime struct {
 	time.Time
 }
 
-type SPEnergyPostcodes struct {
-	postcodes []string
-}
-
 func (t *SPEnergyStartTime) UnmarshalJSON(data []byte) error {
 	s := strings.Trim(string(data), `"`)
 	parsed, err := time.ParseInLocation(sPEnergyStartTimeLayout1, s, ukLocation)
@@ -48,11 +44,6 @@ func (t *SPEnergyEndTime) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (p *SPEnergyPostcodes) UnmarshalJSON(data []byte) error {
-	p.postcodes = strings.Split(string(data), ",")
-	return nil
-}
-
 type SPEnergyIncidents struct {
 	Incidents []SPEnergyIncident `json:"returnValue"`
 }
@@ -62,7 +53,7 @@ type SPEnergyIncident struct {
 	Start        SPEnergyStartTime `json:"CreatedDate"`
 	EstimatedEnd SPEnergyEndTime   `json:"estimatedFix"`
 	ActualEnd    *SPEnergyEndTime  `json:"actualRestorationTime"`
-	Postcode     SPEnergyPostcodes `json:"postcodeList"`
+	Postcodes    Postcodes         `json:"postcodeList"`
 }
 
 func (spei SPEnergyIncident) ToOutage() Outage {
@@ -77,7 +68,7 @@ func (spei SPEnergyIncident) ToOutage() Outage {
 		ID:        spei.ID,
 		Start:     spei.Start.Time,
 		End:       end,
-		Postcodes: spei.Postcode.postcodes,
+		Postcodes: spei.Postcodes,
 	}
 }
 

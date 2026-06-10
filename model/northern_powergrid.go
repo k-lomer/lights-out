@@ -37,7 +37,7 @@ type NorthernPowergridPowercut struct {
 	ID       string                        `json:"Reference"`
 	Start    time.Time                     `json:"LoggedTime"`
 	End      OptionalNorthernPowergridTime `json:"EstimatedTimeTillResolution"`
-	Postcode string                        `json:"Postcode"`
+	Postcode Postcode                      `json:"Postcode"`
 }
 
 func (npp NorthernPowergridPowercut) ToOutage() Outage {
@@ -46,7 +46,7 @@ func (npp NorthernPowergridPowercut) ToOutage() Outage {
 		ID:        npp.ID,
 		Start:     npp.Start,
 		End:       npp.End.Time,
-		Postcodes: []string{npp.Postcode},
+		Postcodes: []Postcode{npp.Postcode},
 	}
 }
 
