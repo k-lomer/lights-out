@@ -54,11 +54,30 @@ func (lh ListHandler) getOutages(ctx context.Context, qp model.QueryParams) ([]m
 	// sort to ensure determinism
 	slices.SortFunc(totalOutages, model.KeyComp)
 
-	// PageSize 0 means return all results
+	// filter by postcode
+	if len(qp.Postcodes) > 0 {
+		hash := qp.Postcodes.GetHashMap()
+
+		totalOutages = slices.Collect(func(yield func(model.Outage) bool) {
+			for _, o := range totalOutages {
+				for _, p := range o.Postcodes {
+					if hash[p] {
+						if !yield(o) {
+							return
+						}
+						continue
+					}
+				}
+			}
+		})
+	}
+
+	// page size 0 means return all results
 	if qp.PageSize == 0 {
 		return totalOutages, nil
 	}
 
+	// return outages based on page size and page index
 	startIndex := min(uint(len(totalOutages)), qp.PageSize*qp.PageIndex)
 	endIndex := min(uint(len(totalOutages)), qp.PageSize*(qp.PageIndex+1))
 	pageOutages := totalOutages[startIndex:endIndex]

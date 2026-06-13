@@ -33,12 +33,13 @@ type SseFault struct {
 }
 
 func (sf SseFault) ToOutage() Outage {
+	postcodes, _ := ParsePostcodes(sf.Postcodes, false)
 	return Outage{
 		DNO:       DnoSse,
 		ID:        sf.ID,
 		Start:     sf.Start.Time,
 		End:       &sf.End.Time,
-		Postcodes: ParsePostcodes(sf.Postcodes),
+		Postcodes: postcodes,
 	}
 }
 

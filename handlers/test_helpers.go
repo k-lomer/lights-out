@@ -36,6 +36,10 @@ func checkDnoOutages(t *testing.T, outages []model.Outage) {
 			t.Errorf("Got no outages for %s", dno)
 		}
 	}
+
+	if t.Failed() {
+		t.FailNow()
+	}
 }
 
 func addQueryParams(req *http.Request, k string, v string) {

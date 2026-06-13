@@ -75,3 +75,35 @@ func Test_ListHandler_AllOutages(t *testing.T) {
 	outages := decodeOutages(t, res.Body)
 	checkDnoOutages(t, outages)
 }
+
+// Test the postcode filter.
+func Test_ListHandler_Postcodes(t *testing.T) {
+	// Get all outages.
+	req := httptest.NewRequest(http.MethodGet, "/list", nil)
+	addQueryParams(req, "pageSize", "0")
+	res := httptest.NewRecorder()
+
+	lh := NewListHandler(NewTestDnoClients())
+	lh.ServeHTTP(res, req)
+
+	assertStatus(t, res.Code, http.StatusOK)
+	outages := decodeOutages(t, res.Body)
+	totalOutagesCount := len(outages)
+	checkDnoOutages(t, outages)
+
+	// Get all outages for the first postcode
+	postcode := outages[0].Postcodes[0]
+	req = httptest.NewRequest(http.MethodGet, "/list", nil)
+	addQueryParams(req, "pageSize", "0")
+	addQueryParams(req, "postcodes", string(postcode))
+	res = httptest.NewRecorder()
+
+	lh.ServeHTTP(res, req)
+	assertStatus(t, res.Code, http.StatusOK)
+	outages = decodeOutages(t, res.Body)
+	postcodeOutagesCount := len(outages)
+	assert.Less(t, postcodeOutagesCount, totalOutagesCount)
+	for _, o := range outages {
+		assert.Equal(t, postcode, o.Postcodes[0])
+	}
+}

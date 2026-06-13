@@ -1,12 +1,14 @@
 package model
 
 import (
+	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_ListUkpnOutages(t *testing.T) {
+func Test_NewPostcode(t *testing.T) {
 	var postcodeTestCases = []struct {
 		input     string
 		expected  string
@@ -54,6 +56,44 @@ func Test_ListUkpnOutages(t *testing.T) {
 			} else {
 				assert.Nil(t, err)
 				assert.Equal(t, tc.expected, string(p))
+			}
+		})
+	}
+}
+
+func Test_ParsePostcodes(t *testing.T) {
+	var postcodeTestCases = []struct {
+		input       []string
+		expected    []Postcode
+		stopOnError bool
+		expectErr   bool
+	}{
+		{[]string{}, []Postcode{}, true, false},
+		{[]string{}, []Postcode{}, false, false},
+		{[]string{""}, []Postcode{}, true, true},
+		{[]string{""}, []Postcode{}, false, false},
+		{[]string{"A33AA"}, []Postcode{Postcode("A3 3AA")}, true, false},
+		{[]string{"A33AA"}, []Postcode{Postcode("A3 3AA")}, false, false},
+		{[]string{"A33AA", "A44AA"}, []Postcode{Postcode("A3 3AA"), Postcode("A4 4AA")}, true, false},
+		{[]string{"A33AA", "A44AA"}, []Postcode{Postcode("A3 3AA"), Postcode("A4 4AA")}, false, false},
+		{[]string{"A3"}, []Postcode{Postcode("A3 3AA")}, true, true},
+		{[]string{"A3"}, []Postcode{}, false, false},
+		{[]string{"A3", "A44AA"}, []Postcode{}, true, true},
+		{[]string{"A3", "A44AA"}, []Postcode{Postcode("A4 4AA")}, false, false},
+		{[]string{"A33AA", "A4"}, []Postcode{}, true, true},
+		{[]string{"A33AA", "A4"}, []Postcode{Postcode("A3 3AA")}, false, false},
+		{[]string{"A3", "A4"}, []Postcode{}, true, true},
+		{[]string{"A3", "A4"}, []Postcode{}, false, false},
+	}
+
+	for _, tc := range postcodeTestCases {
+		t.Run(strings.Join(tc.input, ",")+" stopOnError "+strconv.FormatBool(tc.stopOnError), func(t *testing.T) {
+			p, err := ParsePostcodes(tc.input, tc.stopOnError)
+			if tc.expectErr {
+				assert.Error(t, err)
+			} else {
+				assert.Nil(t, err)
+				assert.Equal(t, Postcodes(tc.expected), p)
 			}
 		})
 	}
