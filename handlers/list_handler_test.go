@@ -107,3 +107,31 @@ func Test_ListHandler_Postcodes(t *testing.T) {
 		assert.Equal(t, postcode, o.Postcodes[0])
 	}
 }
+
+// Test the postcode filter when no postcodes match.
+func Test_ListHandler_PostcodesNoMatches(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, "/list", nil)
+	addQueryParams(req, "pageSize", "0")
+	addQueryParams(req, "postcodes", string("X00XX"))
+	res := httptest.NewRecorder()
+
+	lh := NewListHandler(NewTestDnoClients())
+	lh.ServeHTTP(res, req)
+
+	assertStatus(t, res.Code, http.StatusOK)
+	outages := decodeOutages(t, res.Body)
+	assert.Equal(t, 0, len(outages))
+}
+
+// Test the error case for invalid postcodes.
+func Test_ListHandler_PostcodesInvalid(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, "/list", nil)
+	addQueryParams(req, "pageSize", "0")
+	addQueryParams(req, "postcodes", string("XYZ"))
+	res := httptest.NewRecorder()
+
+	lh := NewListHandler(NewTestDnoClients())
+	lh.ServeHTTP(res, req)
+
+	assertStatus(t, res.Code, http.StatusBadRequest)
+}
