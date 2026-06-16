@@ -28,9 +28,13 @@ func (lh ListHandler) getOutages(ctx context.Context, qp model.QueryParams) ([]m
 	var wg sync.WaitGroup
 
 	clientErrors := 0
-	wg.Add(len(lh.dnoClients))
+	dnoClients := []clients.DnoClient{}
+	for _, dno := range qp.Dnos {
+		wg.Add(1)
+		dnoClients = append(dnoClients, lh.dnoClients[dno])
+	}
 
-	for _, client := range lh.dnoClients {
+	for _, client := range dnoClients {
 		go func() {
 			defer wg.Done()
 			outages, err := client.ListOutages(ctx)
@@ -45,7 +49,7 @@ func (lh ListHandler) getOutages(ctx context.Context, qp model.QueryParams) ([]m
 
 	wg.Wait()
 
-	if clientErrors == len(lh.dnoClients) {
+	if clientErrors == len(qp.Dnos) {
 		return nil, errors.New("all DNO clients failed")
 	}
 

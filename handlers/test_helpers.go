@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/k-lomer/lights-out/model"
+	"github.com/stretchr/testify/assert"
 )
 
 func assertStatus(t *testing.T, code int, expectedCode int) {
@@ -25,13 +26,15 @@ func decodeOutages(t *testing.T, responseBody *bytes.Buffer) []model.Outage {
 	return outages
 }
 
-func checkDnoOutages(t *testing.T, outages []model.Outage) {
+func checkDnoOutages(t *testing.T, outages []model.Outage, expectedDnos []model.Dno) {
 	dnoOutageCount := map[model.Dno]int{}
 	for _, o := range outages {
 		dnoOutageCount[o.DNO] += 1
 	}
 
-	for _, dno := range model.AllDnoList {
+	assert.Equal(t, len(expectedDnos), len(dnoOutageCount))
+
+	for _, dno := range expectedDnos {
 		if dnoOutageCount[dno] == 0 {
 			t.Errorf("Got no outages for %s", dno)
 		}

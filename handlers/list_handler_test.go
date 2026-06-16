@@ -5,6 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/k-lomer/lights-out/model"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -73,7 +74,7 @@ func Test_ListHandler_AllOutages(t *testing.T) {
 
 	assertStatus(t, res.Code, http.StatusOK)
 	outages := decodeOutages(t, res.Body)
-	checkDnoOutages(t, outages)
+	checkDnoOutages(t, outages, model.AllDnoList[:])
 }
 
 // Test the postcode filter.
@@ -89,7 +90,7 @@ func Test_ListHandler_Postcodes(t *testing.T) {
 	assertStatus(t, res.Code, http.StatusOK)
 	outages := decodeOutages(t, res.Body)
 	totalOutagesCount := len(outages)
-	checkDnoOutages(t, outages)
+	checkDnoOutages(t, outages, model.AllDnoList[:])
 
 	// Get all outages for the first postcode
 	postcode := outages[0].Postcodes[0]
@@ -112,7 +113,7 @@ func Test_ListHandler_Postcodes(t *testing.T) {
 func Test_ListHandler_PostcodesNoMatches(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/list", nil)
 	addQueryParams(req, "pageSize", "0")
-	addQueryParams(req, "postcodes", string("X00XX"))
+	addQueryParams(req, "postcodes", "X00XX")
 	res := httptest.NewRecorder()
 
 	lh := NewListHandler(NewTestDnoClients())
@@ -127,11 +128,31 @@ func Test_ListHandler_PostcodesNoMatches(t *testing.T) {
 func Test_ListHandler_PostcodesInvalid(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/list", nil)
 	addQueryParams(req, "pageSize", "0")
-	addQueryParams(req, "postcodes", string("XYZ"))
+	addQueryParams(req, "postcodes", "XYZ")
 	res := httptest.NewRecorder()
 
 	lh := NewListHandler(NewTestDnoClients())
 	lh.ServeHTTP(res, req)
 
 	assertStatus(t, res.Code, http.StatusBadRequest)
+}
+
+// Test DNO selection.
+func Test_ListHandler_DnoSelection(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, "/list", nil)
+	addQueryParams(req, "pageSize", "0")
+	addQueryParams(req, string(model.DnoEnergyNorthWest), "true")
+	addQueryParams(req, string(model.DnoNationalGridDistribution), "true")
+	addQueryParams(req, string(model.DnoNorthernPowergrid), "false")
+	addQueryParams(req, string(model.DnoSPEnergy), "false")
+	addQueryParams(req, string(model.DnoSse), "false")
+	addQueryParams(req, string(model.DnoUKPowerNetwork), "false")
+	res := httptest.NewRecorder()
+
+	lh := NewListHandler(NewTestDnoClients())
+	lh.ServeHTTP(res, req)
+
+	assertStatus(t, res.Code, http.StatusOK)
+	outages := decodeOutages(t, res.Body)
+	checkDnoOutages(t, outages, []model.Dno{model.DnoEnergyNorthWest, model.DnoNationalGridDistribution})
 }

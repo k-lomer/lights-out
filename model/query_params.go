@@ -1,6 +1,7 @@
 package model
 
 import (
+	"errors"
 	"fmt"
 	"net/url"
 	"strconv"
@@ -11,6 +12,7 @@ type QueryParams struct {
 	PageSize  uint
 	PageIndex uint
 	Postcodes Postcodes
+	Dnos      []Dno
 }
 
 func MakeDefaultQueryParams() QueryParams {
@@ -18,6 +20,7 @@ func MakeDefaultQueryParams() QueryParams {
 		PageSize:  10,
 		PageIndex: 0,
 		Postcodes: []Postcode{},
+		Dnos:      []Dno{},
 	}
 }
 
@@ -51,5 +54,30 @@ func ParseQueryParams(values url.Values) (QueryParams, error) {
 		}
 		qp.Postcodes = p
 	}
+
+	for _, dno := range AllDnoList {
+		err := checkDnoTarget(values, &qp.Dnos, dno)
+		if err != nil {
+			return qp, err
+		}
+	}
+	if len(qp.Dnos) == 0 {
+		return qp, errors.New("no DNOs targeted")
+	}
+
 	return qp, nil
+}
+
+func checkDnoTarget(values url.Values, targetDnos *[]Dno, dnoToCheck Dno) error {
+	isTarget := values.Get(string(dnoToCheck))
+	isTargetLower := strings.ToLower(isTarget)
+	if isTargetLower == "" || isTargetLower == "true" {
+		*targetDnos = append(*targetDnos, dnoToCheck)
+		return nil
+	}
+	if isTargetLower == "false" {
+		return nil
+	}
+
+	return fmt.Errorf("unexpected non-boolean value for DNO %s: %s", dnoToCheck, isTarget)
 }
