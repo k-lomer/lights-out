@@ -55,9 +55,9 @@ func (ngp NationalGridPowercut) ToOutage() Outage {
 	}
 }
 
-func (ukpni NationalGridPowercuts) ToOutages() []Outage {
-	outages := make([]Outage, len(ukpni.Incidents))
-	for i, f := range ukpni.Incidents {
+func (ngp NationalGridPowercuts) ToOutages() []Outage {
+	outages := make([]Outage, len(ngp.Incidents))
+	for i, f := range ngp.Incidents {
 		outages[i] = f.ToOutage()
 	}
 	return outages
