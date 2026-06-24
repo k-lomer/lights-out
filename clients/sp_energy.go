@@ -44,7 +44,7 @@ func (client SPEnergyClient) getIncidentCount(ctx context.Context) (int, error) 
 	// Extract to SP Energy model
 	defer drainAndClose(res.Body)
 	if res.StatusCode != http.StatusOK {
-		return 0, fmt.Errorf("unexpected return code from SSE, %d", res.StatusCode)
+		return 0, fmt.Errorf("unexpected return code from SP Energy, %d", res.StatusCode)
 	}
 
 	var result struct {
