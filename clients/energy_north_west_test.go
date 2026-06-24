@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_ListEnergyNorthWestOutages(t *testing.T) {
@@ -13,10 +15,6 @@ func Test_ListEnergyNorthWestOutages(t *testing.T) {
 		Timeout: 30 * time.Second,
 	}
 	res, err := MakeEnergyNorthWestClient(client).ListOutages(ctx)
-	if err != nil {
-		t.Error(err)
-	}
-	if len(res) == 0 {
-		t.Error("didn't get any outages")
-	}
+	assert.NoError(t, err)
+	assert.NotEmpty(t, res)
 }

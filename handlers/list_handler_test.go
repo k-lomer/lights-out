@@ -17,9 +17,9 @@ func Test_ListHandler_Basic(t *testing.T) {
 	lh := NewListHandler(NewTestDnoClients())
 	lh.ServeHTTP(res, req)
 
-	assertStatus(t, res.Code, http.StatusOK)
+	requireStatus(t, res.Code, http.StatusOK)
 	outages := decodeOutages(t, res.Body)
-	assert.Greater(t, len(outages), 0)
+	assert.NotEmpty(t, outages)
 }
 
 // Test the list handler with a small page size returns that number of outages.
@@ -31,9 +31,9 @@ func Test_ListHandler_PageSize(t *testing.T) {
 	lh := NewListHandler(NewTestDnoClients())
 	lh.ServeHTTP(res, req)
 
-	assertStatus(t, res.Code, http.StatusOK)
+	requireStatus(t, res.Code, http.StatusOK)
 	outages := decodeOutages(t, res.Body)
-	assert.Equal(t, len(outages), 2)
+	assert.Len(t, outages, 2)
 }
 
 // Test the list handler with a different page index returns different outages.
@@ -45,7 +45,7 @@ func Test_ListHandler_PageIndex(t *testing.T) {
 	lh := NewListHandler(NewTestDnoClients())
 	lh.ServeHTTP(res, req)
 
-	assertStatus(t, res.Code, http.StatusOK)
+	requireStatus(t, res.Code, http.StatusOK)
 	outages1 := decodeOutages(t, res.Body)
 
 	req = httptest.NewRequest(http.MethodGet, "/list", nil)
@@ -54,7 +54,7 @@ func Test_ListHandler_PageIndex(t *testing.T) {
 
 	lh.ServeHTTP(res, req)
 
-	assertStatus(t, res.Code, http.StatusOK)
+	requireStatus(t, res.Code, http.StatusOK)
 	outages2 := decodeOutages(t, res.Body)
 
 	assert.Equal(t, len(outages1), len(outages2))
@@ -72,7 +72,7 @@ func Test_ListHandler_AllOutages(t *testing.T) {
 	lh := NewListHandler(NewTestDnoClients())
 	lh.ServeHTTP(res, req)
 
-	assertStatus(t, res.Code, http.StatusOK)
+	requireStatus(t, res.Code, http.StatusOK)
 	outages := decodeOutages(t, res.Body)
 	checkDnoOutages(t, outages, model.AllDnoList[:])
 }
@@ -87,7 +87,7 @@ func Test_ListHandler_Postcodes(t *testing.T) {
 	lh := NewListHandler(NewTestDnoClients())
 	lh.ServeHTTP(res, req)
 
-	assertStatus(t, res.Code, http.StatusOK)
+	requireStatus(t, res.Code, http.StatusOK)
 	outages := decodeOutages(t, res.Body)
 	totalOutagesCount := len(outages)
 	checkDnoOutages(t, outages, model.AllDnoList[:])
@@ -100,7 +100,7 @@ func Test_ListHandler_Postcodes(t *testing.T) {
 	res = httptest.NewRecorder()
 
 	lh.ServeHTTP(res, req)
-	assertStatus(t, res.Code, http.StatusOK)
+	requireStatus(t, res.Code, http.StatusOK)
 	outages = decodeOutages(t, res.Body)
 	postcodeOutagesCount := len(outages)
 	assert.Less(t, postcodeOutagesCount, totalOutagesCount)
@@ -119,7 +119,7 @@ func Test_ListHandler_PostcodesNoMatches(t *testing.T) {
 	lh := NewListHandler(NewTestDnoClients())
 	lh.ServeHTTP(res, req)
 
-	assertStatus(t, res.Code, http.StatusOK)
+	requireStatus(t, res.Code, http.StatusOK)
 	outages := decodeOutages(t, res.Body)
 	assert.Equal(t, 0, len(outages))
 }
@@ -134,7 +134,7 @@ func Test_ListHandler_PostcodesInvalid(t *testing.T) {
 	lh := NewListHandler(NewTestDnoClients())
 	lh.ServeHTTP(res, req)
 
-	assertStatus(t, res.Code, http.StatusBadRequest)
+	requireStatus(t, res.Code, http.StatusBadRequest)
 }
 
 // Test DNO selection.
@@ -152,7 +152,7 @@ func Test_ListHandler_DnoSelection(t *testing.T) {
 	lh := NewListHandler(NewTestDnoClients())
 	lh.ServeHTTP(res, req)
 
-	assertStatus(t, res.Code, http.StatusOK)
+	requireStatus(t, res.Code, http.StatusOK)
 	outages := decodeOutages(t, res.Body)
 	checkDnoOutages(t, outages, []model.Dno{model.DnoEnergyNorthWest, model.DnoNationalGridDistribution})
 }

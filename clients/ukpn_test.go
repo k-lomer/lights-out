@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_ListUkpnOutages(t *testing.T) {
@@ -13,7 +15,5 @@ func Test_ListUkpnOutages(t *testing.T) {
 		Timeout: 30 * time.Second,
 	}
 	_, err := MakeUKPowerNetworkClient(client).ListOutages(ctx)
-	if err != nil {
-		t.Error(err)
-	}
+	assert.NoError(t, err)
 }

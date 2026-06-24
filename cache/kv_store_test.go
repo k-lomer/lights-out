@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_KvStore_SetGet(t *testing.T) {
@@ -26,8 +27,8 @@ func Test_KvStore_SetMultiple(t *testing.T) {
 	kv.Set("a", "b")
 	v, err := kv.Get("a")
 
-	assert.NoError(t, err)
-	assert.Equal(t, "b", v)
+	require.NoError(t, err)
+	require.Equal(t, "b", v)
 
 	kv.Set("a", "c")
 	v, err = kv.Get("a")
@@ -82,8 +83,8 @@ func Test_KvStore_Concurrency(t *testing.T) {
 				k = strconv.Itoa(kInt)
 				v, err := kv.Get(k)
 
-				assert.NoError(t, err)
-				assert.Equal(t, k, v)
+				require.NoError(t, err)
+				require.Equal(t, k, v)
 			}
 		}()
 	}

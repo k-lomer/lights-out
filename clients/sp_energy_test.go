@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 // Note that there is a certificate issue for this API
@@ -22,12 +24,8 @@ func Test_getSPEnergyIncidentCount(t *testing.T) {
 		},
 	}
 	count, err := MakeSPEnergyClient(client).getIncidentCount(ctx)
-	if err != nil {
-		t.Error(err)
-	}
-	if count == 0 {
-		t.Error("got 0 incident count")
-	}
+	assert.NoError(t, err)
+	assert.NotZero(t, count)
 }
 
 func Test_getSPEnergyIncidents(t *testing.T) {
@@ -39,14 +37,9 @@ func Test_getSPEnergyIncidents(t *testing.T) {
 		},
 	}
 	incidents, err := MakeSPEnergyClient(client).getIncidents(ctx, 2)
-	if err != nil {
-		t.Error(err)
-	}
-	if incidents == nil {
-		t.Error("failed to get incidents")
-	} else if len(incidents.Incidents) != 2 {
-		t.Errorf("expected 2 incidents, got %d", len(incidents.Incidents))
-	}
+	assert.NoError(t, err)
+	assert.NotNil(t, incidents)
+	assert.Len(t, incidents.Incidents, 2)
 }
 
 func Test_ListSPEnergyOutages(t *testing.T) {
@@ -59,10 +52,6 @@ func Test_ListSPEnergyOutages(t *testing.T) {
 	}
 
 	res, err := MakeSPEnergyClient(client).ListOutages(ctx)
-	if err != nil {
-		t.Error(err)
-	}
-	if len(res) == 0 {
-		t.Error("got 0 outages")
-	}
+	assert.NoError(t, err)
+	assert.NotEmpty(t, res)
 }

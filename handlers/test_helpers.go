@@ -8,20 +8,17 @@ import (
 
 	"github.com/k-lomer/lights-out/model"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-func assertStatus(t *testing.T, code int, expectedCode int) {
-	if code != expectedCode {
-		t.Fatalf("unexpected status code: expected %d, got %d", expectedCode, code)
-	}
+func requireStatus(t *testing.T, code int, expectedCode int) {
+	require.Equal(t, expectedCode, code, "unexpected status code")
 }
 
 func decodeOutages(t *testing.T, responseBody *bytes.Buffer) []model.Outage {
 	var outages []model.Outage
 	err := json.NewDecoder(responseBody).Decode(&outages)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	return outages
 }
@@ -32,12 +29,10 @@ func checkDnoOutages(t *testing.T, outages []model.Outage, expectedDnos []model.
 		dnoOutageCount[o.DNO] += 1
 	}
 
-	assert.Equal(t, len(expectedDnos), len(dnoOutageCount))
+	require.Equal(t, len(expectedDnos), len(dnoOutageCount))
 
 	for _, dno := range expectedDnos {
-		if dnoOutageCount[dno] == 0 {
-			t.Errorf("Got no outages for %s", dno)
-		}
+		assert.Greater(t, dnoOutageCount[dno], 0, "Got no outages for %s", dno)
 	}
 
 	if t.Failed() {

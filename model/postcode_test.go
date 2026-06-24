@@ -54,7 +54,7 @@ func Test_NewPostcode(t *testing.T) {
 			if tc.expectErr {
 				assert.Error(t, err)
 			} else {
-				assert.Nil(t, err)
+				assert.NoError(t, err)
 				assert.Equal(t, tc.expected, string(p))
 			}
 		})
@@ -92,7 +92,7 @@ func Test_ParsePostcodes(t *testing.T) {
 			if tc.expectErr {
 				assert.Error(t, err)
 			} else {
-				assert.Nil(t, err)
+				assert.NoError(t, err)
 				assert.Equal(t, Postcodes(tc.expected), p)
 			}
 		})
