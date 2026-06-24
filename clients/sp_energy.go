@@ -89,6 +89,9 @@ func (client SPEnergyClient) ListOutages(ctx context.Context) ([]model.Outage, e
 	if err != nil {
 		return nil, err
 	}
+	if count == 0 {
+		return []model.Outage{}, nil
+	}
 
 	incidents, err := client.getIncidents(ctx, count)
 	if err != nil {
