@@ -74,7 +74,7 @@ func (lh ListHandler) getOutages(ctx context.Context, qp model.QueryParams) ([]m
 						if !yield(o) {
 							return
 						}
-						continue
+						break
 					}
 				}
 			}
