@@ -48,9 +48,7 @@ func main() {
 
 	log.Println("starting server")
 	err := s.ListenAndServe()
-	if err != nil {
-		if err != http.ErrServerClosed {
-			log.Fatalf("HTTP server error: %v", err)
-		}
+	if err != nil && err != http.ErrServerClosed {
+		log.Fatalf("HTTP server error: %v", err)
 	}
 }
