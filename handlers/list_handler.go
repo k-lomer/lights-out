@@ -26,7 +26,12 @@ func NewListHandler(dnoClients map[model.Dno]clients.DnoClient) ListHandler {
 func (lh ListHandler) getOutages(ctx context.Context, qp model.QueryParams) ([]model.Outage, error) {
 	dnoClients := []clients.DnoClient{}
 	for _, dno := range qp.Dnos {
-		dnoClients = append(dnoClients, lh.dnoClients[dno])
+		client := lh.dnoClients[dno]
+		if client == nil {
+			log.Printf("error getting client for %s", dno)
+			continue
+		}
+		dnoClients = append(dnoClients, client)
 	}
 
 	dnoOutages := make([][]model.Outage, len(dnoClients))
