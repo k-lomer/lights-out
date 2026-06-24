@@ -24,31 +24,36 @@ func NewListHandler(dnoClients map[model.Dno]clients.DnoClient) ListHandler {
 }
 
 func (lh ListHandler) getOutages(ctx context.Context, qp model.QueryParams) ([]model.Outage, error) {
-	var dnoOutages [][]model.Outage
-	var wg sync.WaitGroup
-
-	clientErrors := 0
 	dnoClients := []clients.DnoClient{}
 	for _, dno := range qp.Dnos {
-		wg.Add(1)
 		dnoClients = append(dnoClients, lh.dnoClients[dno])
 	}
 
-	for _, client := range dnoClients {
+	dnoOutages := make([][]model.Outage, len(dnoClients))
+	dnoErrs := make([]error, len(dnoClients))
+	var wg sync.WaitGroup
+	for i, client := range dnoClients {
+		wg.Add(1)
 		go func() {
 			defer wg.Done()
 			outages, err := client.ListOutages(ctx)
 			if err != nil {
 				log.Printf("error getting outages for %s: %v", client.GetDno(), err)
-				clientErrors += 1
+				dnoErrs[i] = err
 				return
 			}
-			dnoOutages = append(dnoOutages, outages)
+			dnoOutages[i] = outages
 		}()
 	}
 
 	wg.Wait()
 
+	clientErrors := 0
+	for _, err := range dnoErrs {
+		if err != nil {
+			clientErrors += 1
+		}
+	}
 	if clientErrors == len(qp.Dnos) {
 		return nil, errors.New("all DNO clients failed")
 	}
