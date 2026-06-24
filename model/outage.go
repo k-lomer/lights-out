@@ -20,9 +20,9 @@ func (o Outage) GetKey() string {
 	return string(o.DNO) + "_" + url.QueryEscape(o.ID)
 }
 
-func AggregateOutages(outages *[][]Outage) []Outage {
+func AggregateOutages(outages [][]Outage) []Outage {
 	var totalOutages []Outage
-	for _, r := range *outages {
+	for _, r := range outages {
 		totalOutages = append(totalOutages, r...)
 	}
 	return totalOutages

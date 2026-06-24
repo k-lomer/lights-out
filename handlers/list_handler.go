@@ -63,7 +63,7 @@ func (lh ListHandler) getOutages(ctx context.Context, qp model.QueryParams) ([]m
 		return nil, errors.New("all DNO clients failed")
 	}
 
-	totalOutages := model.AggregateOutages(&dnoOutages)
+	totalOutages := model.AggregateOutages(dnoOutages)
 
 	// sort to ensure determinism
 	slices.SortFunc(totalOutages, model.KeyComp)
