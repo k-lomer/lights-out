@@ -94,7 +94,9 @@ func (client SPEnergyClient) ListOutages(ctx context.Context) ([]model.Outage, e
 		return []model.Outage{}, nil
 	}
 
-	outages, err := client.getOutages(ctx, count)
+	// Larger count size required, get all reported plus a small buffer to be safe.
+	countBufferSize := 10
+	outages, err := client.getOutages(ctx, count+countBufferSize)
 	if err != nil {
 		return nil, err
 	}
