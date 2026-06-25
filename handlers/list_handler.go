@@ -43,7 +43,7 @@ func (lh ListHandler) getOutages(ctx context.Context, qp model.QueryParams) ([]m
 			defer wg.Done()
 			outages, err := client.ListOutages(ctx)
 			if err != nil {
-				log.Printf("error getting outages for %s: %w", client.GetDno(), err)
+				log.Printf("error getting outages for %s: %v", client.GetDno(), err)
 				dnoErrs[i] = err
 				return
 			}
@@ -113,7 +113,7 @@ func (lh ListHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(outages); err != nil {
-		log.Printf("error encoding outages: %w", err)
+		log.Printf("error encoding outages: %v", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
