@@ -107,8 +107,8 @@ Network Operators) and serves it from one endpoint, `GET /list`. See
 - **`cache.KvStore` is not wired into the request path** yet — it's a
   thread-safe TTL store available for future caching, not active behaviour.
 
-- **Tests** live beside the code (`*_test.go`), use `testify`, and rely on
+- **Tests** live beside the code (`*_test.go`), use `testify`, handler tests rely on
   stubbed HTTP responses / test client maps (see
   [handlers/test_client.go](handlers/test_client.go)) — the suite needs no
-  network access.
+  network access. Client tests are live and do require network access.
 </content>
