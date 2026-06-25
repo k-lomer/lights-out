@@ -12,7 +12,7 @@ import (
 )
 
 var client *http.Client = &http.Client{
-	Timeout: 30 * time.Second,
+	Timeout: 10 * time.Second,
 }
 
 // There is a certificate issue for the SP Energy API.
@@ -21,7 +21,7 @@ var client *http.Client = &http.Client{
 // Use InsecureSkipVerify = true to ignore the incomplete certificate chain (missing intermediate certificates).
 // This could be fixed by manually providing the missing certificates.
 var insecureClient *http.Client = &http.Client{
-	Timeout: 30 * time.Second,
+	Timeout: 10 * time.Second,
 	Transport: &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	},

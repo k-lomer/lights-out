@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"slices"
 	"sync"
+	"time"
 
 	"github.com/k-lomer/lights-out/clients"
 	"github.com/k-lomer/lights-out/model"
@@ -37,7 +38,10 @@ func (lh ListHandler) getOutages(ctx context.Context, qp model.QueryParams) ([]m
 
 	dnoOutages := make([][]model.Outage, len(dnoClients))
 	dnoErrs := make([]error, len(dnoClients))
+	ctx, cancel := context.WithTimeout(ctx, time.Duration(8*time.Second))
+	defer cancel()
 	var wg sync.WaitGroup
+
 	for i, client := range dnoClients {
 		wg.Add(1)
 		go func() {
@@ -55,6 +59,7 @@ func (lh ListHandler) getOutages(ctx context.Context, qp model.QueryParams) ([]m
 				dnoErrs[i] = err
 				return
 			}
+
 			dnoOutages[i] = outages
 		}()
 	}
