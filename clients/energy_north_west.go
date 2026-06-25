@@ -21,7 +21,7 @@ type EnergyNorthWestClient struct {
 func MakeEnergyNorthWestClient(client *http.Client) EnergyNorthWestClient {
 	return EnergyNorthWestClient{
 		httpClient: client,
-		pageSize:   200, // Default value
+		pageSize:   200, // Default value.
 	}
 }
 
@@ -54,7 +54,7 @@ func (client EnergyNorthWestClient) getOutages(ctx context.Context, pageSize int
 		return nil, err
 	}
 
-	// Add query parameters
+	// Add query parameters.
 	q := req.URL.Query()
 	q.Add("pageSize", strconv.Itoa(pageSize))
 	q.Add("pageNumber", "1")
@@ -70,10 +70,10 @@ func (client EnergyNorthWestClient) getOutages(ctx context.Context, pageSize int
 		return nil, err
 	}
 
-	// Extract to Energy North West model
+	// Extract to Energy North West model.
 	defer drainAndClose(res.Body)
 	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected return code from EnergyNorthWest, %d", res.StatusCode)
+		return nil, fmt.Errorf("unexpected return code from %s, %d", client.GetDno(), res.StatusCode)
 	}
 	var outages model.EnergyNorthWestOutages
 	err = json.NewDecoder(res.Body).Decode(&outages)

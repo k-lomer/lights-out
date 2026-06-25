@@ -92,7 +92,7 @@ func Test_ListHandler_Postcodes(t *testing.T) {
 	totalOutagesCount := len(outages)
 	checkDnoOutages(t, outages, model.AllDnoList[:])
 
-	// Get all outages for the first postcode
+	// Get all outages for the first postcode.
 	postcode := outages[0].Postcodes[0]
 	req = httptest.NewRequest(http.MethodGet, "/list", nil)
 	addQueryParams(req, "pageSize", "0")

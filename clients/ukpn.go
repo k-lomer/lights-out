@@ -33,7 +33,7 @@ func (client UKPowerNetworkClient) ListOutages(ctx context.Context) ([]model.Out
 		return nil, err
 	}
 
-	// Spoof browser
+	// Spoof browser.
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:150.0) Gecko/20100101 Firefox/150.0")
 	req.Header.Set("Accept", "text/plain")
 
@@ -42,10 +42,10 @@ func (client UKPowerNetworkClient) ListOutages(ctx context.Context) ([]model.Out
 		return nil, err
 	}
 
-	// Extract to UKPN model
+	// Extract to UKPN model.
 	defer drainAndClose(res.Body)
 	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected return code from UKPN, %d", res.StatusCode)
+		return nil, fmt.Errorf("unexpected return code from %s, %d", client.GetDno(), res.StatusCode)
 	}
 	var outages []model.UKPowerNetworkOutage
 	err = json.NewDecoder(res.Body).Decode(&outages)
@@ -53,6 +53,5 @@ func (client UKPowerNetworkClient) ListOutages(ctx context.Context) ([]model.Out
 		return nil, err
 	}
 
-	// Convert to Outage model
 	return model.UKPowerNetworkToOutages(outages), nil
 }

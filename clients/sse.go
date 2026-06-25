@@ -38,10 +38,10 @@ func (client SseClient) ListOutages(ctx context.Context) ([]model.Outage, error)
 		return nil, err
 	}
 
-	// Extract to SSE model
+	// Extract to SSE model.
 	defer drainAndClose(res.Body)
 	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected return code from SSE, %d", res.StatusCode)
+		return nil, fmt.Errorf("unexpected return code from %s, %d", client.GetDno(), res.StatusCode)
 	}
 	var liveOutages model.SseOutages
 	err = json.NewDecoder(res.Body).Decode(&liveOutages)
@@ -49,6 +49,5 @@ func (client SseClient) ListOutages(ctx context.Context) ([]model.Outage, error)
 		return nil, err
 	}
 
-	// Convert to Outage model
 	return liveOutages.ToOutages(), nil
 }

@@ -72,13 +72,13 @@ func Test_KvStore_Concurrency(t *testing.T) {
 			r := rand.New(rand.NewSource(startTime.UnixMicro()))
 
 			for time.Since(startTime) < runTime {
-				// Set new value
+				// Set new value.
 				kInt := r.Int()
 				k := strconv.Itoa(kInt)
 				kv.Set(k, k)
 				keys = append(keys, kInt)
 
-				// Get existing value
+				// Get existing value.
 				kInt = keys[r.Intn(len(keys))]
 				k = strconv.Itoa(kInt)
 				v, err := kv.Get(k)

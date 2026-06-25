@@ -41,10 +41,10 @@ func (client SPEnergyClient) getOutageCount(ctx context.Context) (int, error) {
 		return 0, err
 	}
 
-	// Extract to SP Energy model
+	// Extract to SP Energy model.
 	defer drainAndClose(res.Body)
 	if res.StatusCode != http.StatusOK {
-		return 0, fmt.Errorf("unexpected return code from SP Energy, %d", res.StatusCode)
+		return 0, fmt.Errorf("unexpected return code from %s, %d", client.GetDno(), res.StatusCode)
 	}
 
 	var result struct {
@@ -70,9 +70,10 @@ func (client SPEnergyClient) getOutages(ctx context.Context, count int) (*model.
 		return nil, err
 	}
 
+	// Extract to SP Energy model.
 	defer drainAndClose(res.Body)
 	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected return code from SPEnergy, %d", res.StatusCode)
+		return nil, fmt.Errorf("unexpected return code from %s, %d", client.GetDno(), res.StatusCode)
 	}
 	var outages model.SPEnergyOutages
 	err = json.NewDecoder(res.Body).Decode(&outages)

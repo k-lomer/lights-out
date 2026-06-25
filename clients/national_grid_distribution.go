@@ -38,10 +38,10 @@ func (client NationalGridDistributionClient) ListOutages(ctx context.Context) ([
 		return nil, err
 	}
 
-	// Extract to National Grid Distribution model
+	// Extract to National Grid Distribution model.
 	defer drainAndClose(res.Body)
 	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected return code from NationalGridDistribution, %d", res.StatusCode)
+		return nil, fmt.Errorf("unexpected return code from %s, %d", client.GetDno(), res.StatusCode)
 	}
 	var outages model.NationalGridOutages
 	err = json.NewDecoder(res.Body).Decode(&outages)
@@ -49,6 +49,5 @@ func (client NationalGridDistributionClient) ListOutages(ctx context.Context) ([
 		return nil, err
 	}
 
-	// Convert to Outage model
 	return outages.ToOutages(), nil
 }
