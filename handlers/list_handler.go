@@ -67,7 +67,7 @@ func (lh ListHandler) getOutages(ctx context.Context, qp model.QueryParams) ([]m
 			clientErrors += 1
 		}
 	}
-	if clientErrors == len(qp.Dnos) {
+	if clientErrors == len(dnoClients) {
 		return nil, errors.New("all DNO clients failed")
 	}
 
