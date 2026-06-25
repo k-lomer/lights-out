@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// Test that outages are listed from the live National Grid Distribution endpoint.
 func Test_ListNationalGridDistributionOutages(t *testing.T) {
 	ctx := context.Background()
 	var client = &http.Client{

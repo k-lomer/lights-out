@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// Test that a value can be set and read back.
 func Test_KvStore_SetGet(t *testing.T) {
 	kv := MakeKvStore(time.Minute)
 
@@ -21,6 +22,7 @@ func Test_KvStore_SetGet(t *testing.T) {
 	assert.Equal(t, "b", v)
 }
 
+// Test that setting an existing key overwrites the previous value.
 func Test_KvStore_SetMultiple(t *testing.T) {
 	kv := MakeKvStore(time.Minute)
 
@@ -37,6 +39,7 @@ func Test_KvStore_SetMultiple(t *testing.T) {
 	assert.Equal(t, "c", v)
 }
 
+// Test that getting a missing key returns ErrMissingKey.
 func Test_KvStore_GetEmpty(t *testing.T) {
 	kv := MakeKvStore(time.Minute)
 
@@ -45,6 +48,7 @@ func Test_KvStore_GetEmpty(t *testing.T) {
 	assert.ErrorIs(t, err, ErrMissingKey{"a"})
 }
 
+// Test that getting an expired value returns ErrExpiredValue.
 func Test_KvStore_GetExpired(t *testing.T) {
 	kv := MakeKvStore(5 * time.Millisecond)
 
@@ -56,6 +60,7 @@ func Test_KvStore_GetExpired(t *testing.T) {
 	}, 100*time.Millisecond, 1*time.Millisecond)
 }
 
+// Test that concurrent sets and gets are safe under many goroutines.
 func Test_KvStore_Concurrency(t *testing.T) {
 	runners := 5
 	runTime := 500 * time.Millisecond

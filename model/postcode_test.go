@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// Test that postcodes are normalised and invalid ones are rejected.
 func Test_NewPostcode(t *testing.T) {
 	var postcodeTestCases = []struct {
 		input     string
@@ -61,6 +62,7 @@ func Test_NewPostcode(t *testing.T) {
 	}
 }
 
+// Test that a list of postcodes is parsed, honouring the stop-on-error flag.
 func Test_ParsePostcodes(t *testing.T) {
 	var postcodeTestCases = []struct {
 		input       []string

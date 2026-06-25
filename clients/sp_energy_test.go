@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// Test that the outage count is fetched from the live SP Energy endpoint.
 func Test_getSPEnergyOutageCount(t *testing.T) {
 	ctx := context.Background()
 	var client = &http.Client{
@@ -23,6 +24,7 @@ func Test_getSPEnergyOutageCount(t *testing.T) {
 	assert.NotZero(t, count)
 }
 
+// Test that the requested number of outages is fetched from SP Energy.
 func Test_getSPEnergyOutages(t *testing.T) {
 	ctx := context.Background()
 	var client = &http.Client{
@@ -37,6 +39,7 @@ func Test_getSPEnergyOutages(t *testing.T) {
 	assert.Len(t, outages.Outages, 2)
 }
 
+// Test that the count-then-fetch flow returns outages from SP Energy.
 func Test_ListSPEnergyOutages(t *testing.T) {
 	ctx := context.Background()
 	var client = &http.Client{
