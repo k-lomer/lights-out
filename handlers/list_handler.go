@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"slices"
@@ -41,6 +42,13 @@ func (lh ListHandler) getOutages(ctx context.Context, qp model.QueryParams) ([]m
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
+			defer func() {
+				if err := recover(); err != nil {
+					log.Printf("panic occurred getting outages for %s: %v", client.GetDno(), err)
+					dnoErrs[i] = fmt.Errorf("%v", err)
+				}
+			}()
+
 			outages, err := client.ListOutages(ctx)
 			if err != nil {
 				log.Printf("error getting outages for %s: %v", client.GetDno(), err)
