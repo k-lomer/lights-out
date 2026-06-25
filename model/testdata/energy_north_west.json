@@ -1,0 +1,61 @@
+{
+ "Items": [
+  {
+   "faultNumber": "INC 125347440",
+   "date": "2026-06-25T10:23:00",
+   "estimatedTimeOfRestoration": "2026-06-25T14:24:00",
+   "actualTimeOfRestoration": "2026-06-25T10:23:00",
+   "AffectedPostcodes": " BB4 9JX"
+  },
+  {
+   "faultNumber": "INC 125347442",
+   "date": "2026-06-25T15:12:00",
+   "estimatedTimeOfRestoration": "2026-06-25T15:30:00",
+   "actualTimeOfRestoration": "2026-06-25T15:12:00",
+   "AffectedPostcodes": " CA14 4TH, CA14 4TQ, CA13 0SD, CA13 0SF, CA13 0SL, CA13 0SQ, CA14 4TJ, CA13 0SN, CA14 4TW, CA13 0RY, CA13 0RE, CA13 0UW, CA13 0RX, CA13 0RN, CA14 4TG, CA14 4SZ, CA13 0SB, CA13 0SJ, CA13 0QY, CA13 0RL, CA14 4TN, CA13 0SA, CA13 0RA, CA14 2XA, CA13 0RZ, CA13 0SH, CA14 4TL, CA13 0SG, CA14 4TB, CA13 0QZ, CA14 4SR, CA13 0SP, CA13 0ST, CA14 4JQ, CA14 4TP, CA13 0RB, CA14 4SY, CA14 4TA, CA14 4RG, CA13 0SR, CA13 0SU, CA14 4JG, CA13 0RD, CA14 4TR, CA14 4SX, CA13 0SS, CA14 4RQ, CA14 4ST, CA13 0SW, CA14 4SU, CA13 0RR, CA13 0QP"
+  },
+  {
+   "faultNumber": "INC 125347890",
+   "date": "2026-06-25T20:47:00",
+   "estimatedTimeOfRestoration": "2026-06-26T00:15:00",
+   "actualTimeOfRestoration": "2026-06-25T20:47:00",
+   "AffectedPostcodes": " M28 7ES, M28 7DE, M28 7FD, M28 2QJ, M28 7ER, M28 2RZ, M28 7FG, M28 7FR, M28 2QH, M28 2GJ, M28 7QH, M28 1BU, M28 7FS, M28 2BJ, M28 7EX, M28 2QL, M28 7FU, M28 2RX, M28 7FA, M28 2QF"
+  },
+  {
+   "faultNumber": "INC 125347684",
+   "date": "2026-06-25T13:42:43",
+   "estimatedTimeOfRestoration": "2026-06-25T23:30:00",
+   "actualTimeOfRestoration": null,
+   "AffectedPostcodes": " SK11 9AE, SK11 9BR, SK11 9AD, SK11 9BW, SK11 9BP, SK11 9AF, SK11 9AW, SK11 9DS"
+  },
+  {
+   "faultNumber": "INC 125348050",
+   "date": "2026-06-25T22:24:17",
+   "estimatedTimeOfRestoration": "2026-06-26T04:24:00",
+   "actualTimeOfRestoration": null,
+   "AffectedPostcodes": " PR4 3HW, PR4 3HG, PR4 3HZ, PR4 3JG, PR4 3HF, PR4 3JE, PR4 3HA, PR4 3JD, PR4 3JN, PR4 3JH"
+  },
+  {
+   "faultNumber": "INC 125348057",
+   "date": "2026-06-25T22:39:58",
+   "estimatedTimeOfRestoration": "2026-06-26T04:39:00",
+   "actualTimeOfRestoration": null,
+   "AffectedPostcodes": " CA10 2EN, CA10 2ES, CA10 2ER"
+  },
+  {
+   "faultNumber": "02911N2026",
+   "date": "2026-06-25T00:00:00",
+   "estimatedTimeOfRestoration": null,
+   "actualTimeOfRestoration": null,
+   "AffectedPostcodes": " LA1 5JS"
+  },
+  {
+   "faultNumber": "04136N2026",
+   "date": "2026-06-25T00:00:00",
+   "estimatedTimeOfRestoration": null,
+   "actualTimeOfRestoration": null,
+   "AffectedPostcodes": " M30 7AF, M30 7AA, M30 7BL, M30 7AD, M30 7AH, M30 7AB, M30 7AW, M30 7FJ"
+  }
+ ],
+ "TotalResults": 8
+}

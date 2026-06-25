@@ -1,0 +1,105 @@
+{
+ "Faults": [
+  {
+   "UUID": "06b4d877-026c-4d65-88dc-357d847cf314",
+   "loggedAt": "2026-06-25T11:00:00.000+0000",
+   "estimatedRestoration": "2026-06-26T00:00:00.000+0000",
+   "affectedAreas": [
+    "HP13 7DZ",
+    "HP13 7EA",
+    "HP13 7EE",
+    "HP13 7EF",
+    "HP13 7EG"
+   ]
+  },
+  {
+   "UUID": "ca4ca399-1e1a-414a-bc11-226e6d1ef9b6",
+   "loggedAt": "2026-06-25T03:59:00.000+0000",
+   "estimatedRestoration": "2026-06-26T03:00:00.000+0000",
+   "affectedAreas": [
+    "SO30 0FD",
+    "SO30 0FF",
+    "SO30 0PD",
+    "SO30 0PE",
+    "SO30 0PF"
+   ]
+  },
+  {
+   "UUID": "44cb3298-460d-493e-9837-4cd4ec5a6397",
+   "loggedAt": "2026-06-25T06:04:00.000+0000",
+   "estimatedRestoration": "2026-06-26T05:00:00.000+0000",
+   "affectedAreas": [
+    "SL6 8DW",
+    "SL6 8PR",
+    "SL6 8PZ",
+    "SL6 8QA",
+    "SL6 8QD",
+    "SL6 8QE",
+    "SL6 8QP"
+   ]
+  },
+  {
+   "UUID": "59037158-3306-475c-8ff5-faca8395270e",
+   "loggedAt": "2026-06-25T04:24:00.000+0000",
+   "estimatedRestoration": "2026-06-26T00:00:00.000+0000",
+   "affectedAreas": [
+    "DT11 8LJ",
+    "DT11 8LN",
+    "DT11 8QN",
+    "DT11 8QU"
+   ]
+  },
+  {
+   "UUID": "3288a77b-7194-4610-8fe5-bfc0281f90f3",
+   "loggedAt": "2026-06-25T10:59:00.000+0000",
+   "estimatedRestoration": "2026-06-26T05:00:00.000+0000",
+   "affectedAreas": [
+    "SL5 8TG",
+    "SL5 8TN"
+   ]
+  },
+  {
+   "UUID": "604c6dfa-eefe-44c8-826a-bc087cd45bb2",
+   "loggedAt": "2026-06-25T13:52:00.000+0000",
+   "estimatedRestoration": "2026-06-26T01:00:00.000+0000",
+   "affectedAreas": [
+    "SO30 2ER",
+    "SO30 2EY",
+    "SO30 2NW",
+    "SO30 2NY",
+    "SO30 2NZ",
+    "SO30 2RG",
+    "SO30 2RJ",
+    "SO30 2SR",
+    "SO30 2SS"
+   ]
+  },
+  {
+   "UUID": "48ced2ad-5fee-45b9-9862-8c1d3511bf55",
+   "loggedAt": "2026-06-25T14:07:00.000+0000",
+   "estimatedRestoration": "2026-06-26T01:00:00.000+0000",
+   "affectedAreas": [
+    "BH3 7JD",
+    "BH3 7JE",
+    "BH9 2JB",
+    "BH9 2JF",
+    "BH9 2JH",
+    "BH9 2JQ"
+   ]
+  },
+  {
+   "UUID": "66414dd6-3a35-4aa5-9a34-1e8a2b065f6f",
+   "loggedAt": "2026-06-25T00:58:00.000+0000",
+   "estimatedRestoration": "2026-06-26T05:00:00.000+0000",
+   "affectedAreas": [
+    "TW4 5EJ",
+    "TW4 5EL",
+    "TW4 5EN"
+   ]
+  }
+ ],
+ "GlobalResilienceLinksEnabled": {
+  "com.sse.ssepd.sepd": false,
+  "com.sse.ssepd.shepd": false
+ }
+}

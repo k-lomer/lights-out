@@ -44,8 +44,8 @@ func (npo NorthernPowergridOutage) ToOutage() Outage {
 	return Outage{
 		DNO:       DnoNorthernPowergrid,
 		ID:        npo.ID,
-		Start:     &npo.Start,
-		End:       npo.End.Time,
+		Start:     toUTC(&npo.Start),
+		End:       toUTC(npo.End.Time),
 		Postcodes: []Postcode{npo.Postcode},
 	}
 }

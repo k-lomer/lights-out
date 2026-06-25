@@ -37,8 +37,8 @@ func (so SseOutage) ToOutage() Outage {
 	return Outage{
 		DNO:       DnoSse,
 		ID:        so.ID,
-		Start:     &so.Start.Time,
-		End:       &so.End.Time,
+		Start:     toUTC(&so.Start.Time),
+		End:       toUTC(&so.End.Time),
 		Postcodes: postcodes,
 	}
 }

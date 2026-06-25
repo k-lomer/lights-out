@@ -49,8 +49,8 @@ func (ngo NationalGridOutage) ToOutage() Outage {
 	return Outage{
 		DNO:       DnoNationalGridDistribution,
 		ID:        ngo.ID,
-		Start:     ngo.Start.Time,
-		End:       ngo.End.Time,
+		Start:     toUTC(ngo.Start.Time),
+		End:       toUTC(ngo.End.Time),
 		Postcodes: ngo.Postcodes,
 	}
 }

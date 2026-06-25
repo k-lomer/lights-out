@@ -46,8 +46,8 @@ func (enw EnergyNorthWestOutage) ToOutage() Outage {
 	return Outage{
 		DNO:       DnoEnergyNorthWest,
 		ID:        enw.ID,
-		Start:     &enw.Start.Time,
-		End:       end,
+		Start:     toUTC(&enw.Start.Time),
+		End:       toUTC(end),
 		Postcodes: enw.Postcodes,
 	}
 }

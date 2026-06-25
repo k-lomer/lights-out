@@ -56,8 +56,8 @@ func (ukpno UKPowerNetworkOutage) ToOutage() Outage {
 	return Outage{
 		DNO:       DnoUKPowerNetwork,
 		ID:        ukpno.ID,
-		Start:     &ukpno.Start.Time,
-		End:       endTime,
+		Start:     toUTC(&ukpno.Start.Time),
+		End:       toUTC(endTime),
 		Postcodes: postcodes,
 	}
 }

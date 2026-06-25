@@ -1,0 +1,546 @@
+{
+ "lastUpdated": "2026-06-25T23:29:00.000+0100",
+ "incidents": [
+  {
+   "lastUpdated": "2026-06-25 23:29:00",
+   "etr": "1900-01-01 00:00:00",
+   "startTime": "2026-05-21 12:20:00",
+   "areas": [
+    "B24"
+   ],
+   "id": "INCD-64340-m",
+   "totalOff": 1,
+   "region": "West Midlands",
+   "postcodes": [
+    "B24 9FF"
+   ],
+   "confirmedOff": 1
+  },
+  {
+   "lastUpdated": "2026-06-25 23:29:00",
+   "etr": "2026-07-03 16:00:00",
+   "startTime": "2026-06-12 11:06:00",
+   "areas": [
+    "WV16"
+   ],
+   "id": "INCD-67329-m",
+   "totalOff": 2,
+   "region": "West Midlands",
+   "postcodes": [
+    "WV16 6UQ"
+   ],
+   "confirmedOff": 2
+  },
+  {
+   "lastUpdated": "2026-06-25 23:29:00",
+   "etr": "1900-01-01 00:00:00",
+   "startTime": "2026-06-14 09:35:00",
+   "areas": [
+    "LN3"
+   ],
+   "id": "INCD-129549-h",
+   "totalOff": 1,
+   "region": "East Midlands",
+   "postcodes": [
+    "LN3 4NG"
+   ],
+   "confirmedOff": 1
+  },
+  {
+   "lastUpdated": "2026-06-25 23:29:00",
+   "etr": "1900-01-01 00:00:00",
+   "startTime": "2026-06-20 08:06:00",
+   "areas": [
+    "LE4"
+   ],
+   "id": "INCD-130298-h",
+   "totalOff": 9,
+   "region": "East Midlands",
+   "postcodes": [
+    "LE4 8GP"
+   ],
+   "confirmedOff": 9
+  },
+  {
+   "lastUpdated": "2026-06-25 23:29:00",
+   "etr": "1900-01-01 00:00:00",
+   "startTime": "2026-06-24 02:58:00",
+   "areas": [
+    "MK46"
+   ],
+   "id": "INCD-8112-n",
+   "totalOff": 2,
+   "region": "East Midlands",
+   "postcodes": [
+    "MK46 5DN"
+   ],
+   "confirmedOff": 2
+  },
+  {
+   "lastUpdated": "2026-06-25 23:29:00",
+   "etr": "1900-01-01 00:00:00",
+   "startTime": "2026-06-24 18:09:00",
+   "areas": [
+    "WS13"
+   ],
+   "id": "INCD-362222-f",
+   "totalOff": 5,
+   "region": "West Midlands",
+   "postcodes": [
+    "WS13 6TN"
+   ],
+   "confirmedOff": 5
+  },
+  {
+   "lastUpdated": "2026-06-25 23:29:00",
+   "etr": "2026-06-26 04:00:00",
+   "startTime": "2026-06-25 08:51:00",
+   "areas": [
+    "BS37"
+   ],
+   "id": "INCD-19887-l",
+   "totalOff": 60,
+   "region": "West Midlands",
+   "postcodes": [
+    "BS37 5TN",
+    "BS37 5UA",
+    "BS37 5UB",
+    "BS37 5UD",
+    "BS37 5UQ"
+   ],
+   "confirmedOff": 60
+  },
+  {
+   "lastUpdated": "2026-06-25 23:29:00",
+   "etr": "1900-01-01 00:00:00",
+   "startTime": "2026-06-25 14:43:00",
+   "areas": [
+    "DY2"
+   ],
+   "id": "INCD-67864-p",
+   "totalOff": 4,
+   "region": "West Midlands",
+   "postcodes": [
+    "DY2 0XW",
+    "DY2 8TA",
+    "DY2 9AD",
+    "DY2 9AE"
+   ],
+   "confirmedOff": 4
+  },
+  {
+   "lastUpdated": "2026-06-25 23:29:00",
+   "etr": "1900-01-01 00:00:00",
+   "startTime": "2026-06-25 15:16:00",
+   "areas": [
+    "CV1"
+   ],
+   "id": "INCD-8430-n",
+   "totalOff": 1,
+   "region": "East Midlands",
+   "postcodes": [
+    "CV1 5RP"
+   ],
+   "confirmedOff": 1
+  },
+  {
+   "lastUpdated": "2026-06-25 23:29:00",
+   "etr": "1900-01-01 00:00:00",
+   "startTime": "2026-06-25 15:17:00",
+   "areas": [
+    "WR5"
+   ],
+   "id": "INCD-67878-p",
+   "totalOff": 7,
+   "region": "West Midlands",
+   "postcodes": [
+    "WR5 3QJ",
+    "WR5 3QL"
+   ],
+   "confirmedOff": 7
+  },
+  {
+   "lastUpdated": "2026-06-25 23:29:00",
+   "etr": "2026-06-26 02:00:00",
+   "startTime": "2026-06-25 09:10:00",
+   "areas": [
+    "SY21",
+    "SY5"
+   ],
+   "id": "INCD-67792-p",
+   "totalOff": 65,
+   "region": "West Midlands",
+   "postcodes": [
+    "SY21 8EP",
+    "SY21 8ER",
+    "SY5 9AL",
+    "SY5 9AP",
+    "SY5 9DG",
+    "SY5 9DN",
+    "SY5 9DR",
+    "SY5 9DS",
+    "SY5 9DU",
+    "SY5 9DW"
+   ],
+   "confirmedOff": 65
+  },
+  {
+   "lastUpdated": "2026-06-25 23:29:00",
+   "etr": "1900-01-01 00:00:00",
+   "startTime": "2026-06-25 16:07:00",
+   "areas": [
+    "TF3"
+   ],
+   "id": "INCD-67889-p",
+   "totalOff": 25,
+   "region": "West Midlands",
+   "postcodes": [
+    "TF3 3AT",
+    "TF3 3BD",
+    "TF3 3BQ"
+   ],
+   "confirmedOff": 25
+  },
+  {
+   "lastUpdated": "2026-06-25 23:29:00",
+   "etr": "2026-06-26 06:00:00",
+   "startTime": "2026-06-25 17:47:00",
+   "areas": [
+    "DY14"
+   ],
+   "id": "INCD-67907-p",
+   "totalOff": 45,
+   "region": "West Midlands",
+   "postcodes": [
+    "DY14 8EN",
+    "DY14 8EW",
+    "DY14 8HB",
+    "DY14 8HD",
+    "DY14 8HH",
+    "DY14 8JP",
+    "DY14 8JR",
+    "DY14 8JT",
+    "DY14 8SY",
+    "DY14 8SZ"
+   ],
+   "confirmedOff": 45
+  },
+  {
+   "lastUpdated": "2026-06-25 23:29:00",
+   "etr": "1900-01-01 00:00:00",
+   "startTime": "2026-06-25 17:05:00",
+   "areas": [
+    "B78"
+   ],
+   "id": "INCD-8450-n",
+   "totalOff": 2,
+   "region": "East Midlands",
+   "postcodes": [
+    "B78 3RF"
+   ],
+   "confirmedOff": 2
+  },
+  {
+   "lastUpdated": "2026-06-25 23:29:00",
+   "etr": "2026-06-26 06:00:00",
+   "startTime": "2026-06-25 18:11:00",
+   "areas": [
+    "DE13",
+    "WS15"
+   ],
+   "id": "INCD-67914-p",
+   "totalOff": 91,
+   "region": "West Midlands",
+   "postcodes": [
+    "DE13 8PF",
+    "WS15 3SJ",
+    "WS15 3SL"
+   ],
+   "confirmedOff": 91
+  },
+  {
+   "lastUpdated": "2026-06-25 23:29:00",
+   "etr": "1900-01-01 00:00:00",
+   "startTime": "2026-06-25 19:03:00",
+   "areas": [
+    "TA6"
+   ],
+   "id": "INCD-96406-l",
+   "totalOff": 16,
+   "region": "South West",
+   "postcodes": [
+    "TA6 4ES",
+    "TA6 4ET",
+    "TA6 4EU",
+    "TA6 4EX",
+    "TA6 4EY",
+    "TA6 4HA",
+    "TA6 4HB",
+    "TA6 4PP",
+    "TA6 4UA"
+   ],
+   "confirmedOff": 16
+  },
+  {
+   "lastUpdated": "2026-06-25 23:29:00",
+   "etr": "2026-06-26 03:00:00",
+   "startTime": "2026-06-25 18:58:00",
+   "areas": [
+    "BS23"
+   ],
+   "id": "INCD-96405-l",
+   "totalOff": 2,
+   "region": "South West",
+   "postcodes": [
+    "BS23 3PX",
+    "BS23 3PY",
+    "BS23 3PZ",
+    "BS23 3QG",
+    "BS23 3QQ",
+    "BS23 3QX",
+    "BS23 3QZ"
+   ],
+   "confirmedOff": 2
+  },
+  {
+   "lastUpdated": "2026-06-25 23:29:00",
+   "etr": "2026-06-26 04:00:00",
+   "startTime": "2026-06-25 16:32:00",
+   "areas": [
+    "PL26"
+   ],
+   "id": "INCD-96385-l",
+   "totalOff": 3,
+   "region": "South West",
+   "postcodes": [
+    "PL26 7PL",
+    "PL26 7PW"
+   ],
+   "confirmedOff": 3
+  },
+  {
+   "lastUpdated": "2026-06-25 23:29:00",
+   "etr": "2026-06-26 00:30:00",
+   "startTime": "2026-06-25 21:16:00",
+   "areas": [
+    "PL19"
+   ],
+   "id": "INCD-96450-l",
+   "totalOff": 11,
+   "region": "South West",
+   "postcodes": [
+    "PL19 8RR"
+   ],
+   "confirmedOff": 11
+  },
+  {
+   "lastUpdated": "2026-06-25 23:29:00",
+   "etr": "2026-06-26 04:00:00",
+   "startTime": "2026-06-25 21:19:00",
+   "areas": [
+    "EX23"
+   ],
+   "id": "INCD-96446-l",
+   "totalOff": 62,
+   "region": "South West",
+   "postcodes": [
+    "EX23 9HN",
+    "EX23 9HP",
+    "EX23 9HW"
+   ],
+   "confirmedOff": 62
+  },
+  {
+   "lastUpdated": "2026-06-25 23:29:00",
+   "etr": "2026-06-26 03:00:00",
+   "startTime": "2026-06-25 19:59:00",
+   "areas": [
+    "EX10",
+    "EX11"
+   ],
+   "id": "INCD-96449-l",
+   "totalOff": 380,
+   "region": "South West",
+   "postcodes": [
+    "EX10 0BB",
+    "EX10 0BD",
+    "EX10 0BJ",
+    "EX10 0BP",
+    "EX10 0BR",
+    "EX10 0BS",
+    "EX10 0BT",
+    "EX10 0BU",
+    "EX10 0BW",
+    "EX10 0BX",
+    "EX10 0BY",
+    "EX10 0BZ",
+    "EX10 0DA",
+    "EX10 0DB",
+    "EX10 0DD",
+    "EX10 0DF",
+    "EX10 0DG",
+    "EX10 0DP",
+    "EX10 0DR",
+    "EX10 0DS",
+    "EX10 0DT",
+    "EX10 0DU",
+    "EX10 0DW",
+    "EX10 0DZ",
+    "EX10 0EB",
+    "EX10 0ED",
+    "EX10 0EE",
+    "EX10 0EF",
+    "EX10 0HD",
+    "EX10 0JP",
+    "EX10 0PW",
+    "EX10 0SS",
+    "EX10 0UA",
+    "EX11 1SB",
+    "EX11 1SD",
+    "EX11 1SE",
+    "EX11 1SF"
+   ],
+   "confirmedOff": 380
+  },
+  {
+   "lastUpdated": "2026-06-25 23:29:00",
+   "etr": "1900-01-01 00:00:00",
+   "startTime": "2026-06-25 21:25:00",
+   "areas": [
+    "B1",
+    "B5"
+   ],
+   "id": "INCD-362295-f",
+   "totalOff": 76,
+   "region": "West Midlands",
+   "postcodes": [
+    "B1 1DA",
+    "B1 1DD",
+    "B1 1EG",
+    "B5 4AS",
+    "B5 4BA",
+    "B5 4BB",
+    "B5 4TD",
+    "B5 4TE",
+    "B5 4TG",
+    "B5 4TP",
+    "B5 4TR",
+    "B5 4TW",
+    "B5 6NU",
+    "B5 7AA",
+    "B5 7AH"
+   ],
+   "confirmedOff": 76
+  },
+  {
+   "lastUpdated": "2026-06-25 23:29:00",
+   "etr": "2026-06-26 02:00:00",
+   "startTime": "2026-06-25 22:29:00",
+   "areas": [
+    "PL32"
+   ],
+   "id": "INCD-96474-l",
+   "totalOff": 6,
+   "region": "South West",
+   "postcodes": [
+    "PL32 9XZ",
+    "PL32 9YF"
+   ],
+   "confirmedOff": 6
+  },
+  {
+   "lastUpdated": "2026-06-25 23:29:00",
+   "etr": "2026-06-26 00:30:00",
+   "startTime": "2026-06-25 23:03:00",
+   "areas": [
+    "NP4"
+   ],
+   "id": "INCD-56302-f",
+   "totalOff": 494,
+   "region": "South Wales",
+   "postcodes": [
+    "NP4 8BG",
+    "NP4 8BP",
+    "NP4 8BQ",
+    "NP4 8BR",
+    "NP4 8BS",
+    "NP4 8BT",
+    "NP4 8BU",
+    "NP4 8BW",
+    "NP4 8BX",
+    "NP4 8BY",
+    "NP4 8BZ",
+    "NP4 8DA",
+    "NP4 8DJ",
+    "NP4 8EG",
+    "NP4 8JB",
+    "NP4 8JD",
+    "NP4 8JG",
+    "NP4 8JH",
+    "NP4 8JJ",
+    "NP4 8JL",
+    "NP4 8JN",
+    "NP4 8JP",
+    "NP4 8JQ",
+    "NP4 8JR",
+    "NP4 8JS",
+    "NP4 8JT",
+    "NP4 8JU",
+    "NP4 8JW",
+    "NP4 8JX",
+    "NP4 8NB",
+    "NP4 8TS",
+    "NP4 8TU"
+   ],
+   "confirmedOff": 494
+  },
+  {
+   "lastUpdated": "2026-06-25 23:29:00",
+   "etr": "2026-06-26 01:00:00",
+   "startTime": "2026-06-25 23:13:00",
+   "areas": [
+    "CF83"
+   ],
+   "id": "INCD-56308-f",
+   "totalOff": 170,
+   "region": "South Wales",
+   "postcodes": [
+    "CF83 8AZ",
+    "CF83 8PX",
+    "CF83 8PY",
+    "CF83 8PZ",
+    "CF83 8QA",
+    "CF83 8QB",
+    "CF83 8QD",
+    "CF83 8QE",
+    "CF83 8QF",
+    "CF83 8QS",
+    "CF83 8QT",
+    "CF83 8QW",
+    "CF83 8QZ",
+    "CF83 8RN",
+    "CF83 8RQ"
+   ],
+   "confirmedOff": 170
+  },
+  {
+   "lastUpdated": "2026-06-25 23:29:00",
+   "etr": "1900-01-01 00:00:00",
+   "startTime": "2026-06-25 15:02:00",
+   "areas": [
+    "CV8"
+   ],
+   "id": "INCD-8428-n",
+   "totalOff": 1,
+   "region": "East Midlands",
+   "postcodes": [
+    "CV8 1FA",
+    "CV8 1FG",
+    "CV8 1FN",
+    "CV8 1FQ",
+    "CV8 1NL"
+   ],
+   "confirmedOff": 1
+  }
+ ]
+}

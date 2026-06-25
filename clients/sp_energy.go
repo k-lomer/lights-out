@@ -35,6 +35,8 @@ func (client SPEnergyClient) getOutageCount(ctx context.Context) (int, error) {
 	if err != nil {
 		return 0, err
 	}
+	// The provider returns an empty body unless the JSON content type is declared.
+	req.Header.Set("Content-Type", "application/json")
 
 	res, err := client.httpClient.Do(req)
 	if err != nil {
@@ -64,6 +66,8 @@ func (client SPEnergyClient) getOutages(ctx context.Context, count int) (*model.
 	if err != nil {
 		return nil, err
 	}
+	// The provider returns an empty body unless the JSON content type is declared.
+	req.Header.Set("Content-Type", "application/json")
 
 	res, err := client.httpClient.Do(req)
 	if err != nil {

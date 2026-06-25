@@ -7,14 +7,35 @@ import (
 	"time"
 )
 
+// ukLocation is the assumed timezone for DNOs that report timestamps without a
+// timezone offset (Energy North West, National Grid, SP Energy, UK Power Network).
+// We assume those naked times are UK local wall-clock and parse them here before
+// normalising to UTC in ToOutage. This is an assumption: if a provider actually
+// emits UTC, its summer (BST) times will be an hour out. Northern Powergrid and
+// SSE include an explicit offset, so they do not rely on this.
 var ukLocation, _ = time.LoadLocation("Europe/London")
 
+// Outage is the canonical, provider-agnostic representation of a power cut.
+//
+// Start and End are always in UTC. The DNOs report times in a mix of zones —
+// some as UK local wall-clock, others as UTC — so each client's ToOutage
+// normalises them through toUTC, giving consumers one consistent timezone.
 type Outage struct {
 	DNO       Dno        `json:"dno"`
 	ID        string     `json:"id"`
 	Start     *time.Time `json:"start_time"`
 	End       *time.Time `json:"end_time"`
 	Postcodes Postcodes  `json:"postcodes"`
+}
+
+// toUTC normalises a time pointer to UTC, preserving nil. Every Outage time is
+// stored in UTC, so each ToOutage routes its start and end through this.
+func toUTC(t *time.Time) *time.Time {
+	if t == nil {
+		return nil
+	}
+	u := t.UTC()
+	return &u
 }
 
 func (o Outage) GetKey() string {
