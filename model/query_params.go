@@ -31,7 +31,7 @@ func ParseQueryParams(values url.Values) (QueryParams, error) {
 	if pageSize != "" {
 		i, err := strconv.ParseUint(pageSize, 10, 0)
 		if err != nil {
-			return qp, fmt.Errorf("failed to parse pageSize '%s': %v", pageSize, err)
+			return qp, fmt.Errorf("failed to parse pageSize '%s': %w", pageSize, err)
 		}
 		qp.PageSize = uint(i)
 	}
@@ -40,7 +40,7 @@ func ParseQueryParams(values url.Values) (QueryParams, error) {
 	if pageIndex != "" {
 		i, err := strconv.ParseUint(pageIndex, 10, 0)
 		if err != nil {
-			return qp, fmt.Errorf("failed to parse pageIndex '%s': %v", pageIndex, err)
+			return qp, fmt.Errorf("failed to parse pageIndex '%s': %w", pageIndex, err)
 		}
 		qp.PageIndex = uint(i)
 	}
@@ -50,7 +50,7 @@ func ParseQueryParams(values url.Values) (QueryParams, error) {
 		postcodeStrings := strings.Split(string(postcodes), ",")
 		p, err := ParsePostcodes(postcodeStrings, true)
 		if err != nil {
-			return qp, fmt.Errorf("failed to parse postcode: %v", err)
+			return qp, fmt.Errorf("failed to parse postcode: %w", err)
 		}
 		qp.Postcodes = p
 	}

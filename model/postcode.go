@@ -62,7 +62,7 @@ func ParsePostcodes(postcodeStrings []string, stopOnError bool) (Postcodes, erro
 			if stopOnError {
 				return postcodes, err
 			}
-			log.Printf("%v", err)
+			log.Printf("%w", err)
 			continue
 
 		}
