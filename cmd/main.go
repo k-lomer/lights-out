@@ -15,6 +15,11 @@ var client *http.Client = &http.Client{
 	Timeout: 30 * time.Second,
 }
 
+// There is a certificate issue for the SP Energy API
+// x509: certificate signed by unknown authority
+// This can be checked with `openssl s_client -connect powercuts.spenergynetworks.co.uk:443 -showcerts`
+// Use InsecureSkipVerify = true to ignore the incomplete certificate chain (missing intermediate certificates)
+// This could be fixed by manually providing the missing certificates
 var insecureClient *http.Client = &http.Client{
 	Timeout: 30 * time.Second,
 	Transport: &http.Transport{
