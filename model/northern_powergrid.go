@@ -35,7 +35,7 @@ func (o *OptionalNorthernPowergridTime) UnmarshalJSON(data []byte) error {
 
 type NorthernPowergridOutage struct {
 	ID       string                        `json:"Reference"`
-	Start    time.Time                     `json:"LoggedTime"`
+	Start    *time.Time                    `json:"LoggedTime"`
 	End      OptionalNorthernPowergridTime `json:"EstimatedTimeTillResolution"`
 	Postcode Postcode                      `json:"Postcode"`
 }
@@ -44,14 +44,18 @@ func (npo NorthernPowergridOutage) ToOutage() Outage {
 	return Outage{
 		DNO:       DnoNorthernPowergrid,
 		ID:        npo.ID,
-		Start:     toUTC(&npo.Start),
+		Start:     toUTC(npo.Start),
 		End:       toUTC(npo.End.Time),
 		Postcodes: []Postcode{npo.Postcode},
 	}
 }
 
 func (npo NorthernPowergridOutage) getKey() string {
-	return npo.ID + npo.Start.String() + npo.End.String()
+	start := "nil"
+	if npo.Start != nil {
+		start = npo.Start.String()
+	}
+	return npo.ID + start + npo.End.String()
 }
 
 func NorthernPowergridToOutages(npos []NorthernPowergridOutage) []Outage {

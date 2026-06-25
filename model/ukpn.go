@@ -38,13 +38,18 @@ func (u *ukpnTimeMs) UnmarshalJSON(data []byte) error {
 
 type UKPowerNetworkOutage struct {
 	ID        string      `json:"IncidentReference"`
-	Start     ukpnTime    `json:"CreationDateTime"`
+	Start     *ukpnTime   `json:"CreationDateTime"`
 	Restored  *ukpnTimeMs `json:"RestoredDateTime"`
 	Estimated *ukpnTime   `json:"EstimatedRestorationDate"`
 	Postcodes []string    `json:"FullPostcodeData"`
 }
 
 func (ukpno UKPowerNetworkOutage) ToOutage() Outage {
+	var startTime *time.Time
+	if ukpno.Start != nil {
+		startTime = &ukpno.Start.Time
+	}
+
 	var endTime *time.Time
 	if ukpno.Restored != nil {
 		endTime = &ukpno.Restored.Time
@@ -56,7 +61,7 @@ func (ukpno UKPowerNetworkOutage) ToOutage() Outage {
 	return Outage{
 		DNO:       DnoUKPowerNetwork,
 		ID:        ukpno.ID,
-		Start:     toUTC(&ukpno.Start.Time),
+		Start:     toUTC(startTime),
 		End:       toUTC(endTime),
 		Postcodes: postcodes,
 	}

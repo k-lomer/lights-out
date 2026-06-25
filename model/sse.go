@@ -27,18 +27,29 @@ type SseOutages struct {
 
 type SseOutage struct {
 	ID        string   `json:"UUID"`
-	Start     SseTime  `json:"loggedAt"`
-	End       SseTime  `json:"estimatedRestoration"`
+	Start     *SseTime `json:"loggedAt"`
+	End       *SseTime `json:"estimatedRestoration"`
 	Postcodes []string `json:"affectedAreas"`
 }
 
 func (so SseOutage) ToOutage() Outage {
 	postcodes, _ := ParsePostcodes(so.Postcodes, false)
+
+	var start *time.Time
+	if so.Start != nil {
+		start = &so.Start.Time
+	}
+
+	var end *time.Time
+	if so.End != nil {
+		end = &so.End.Time
+	}
+
 	return Outage{
 		DNO:       DnoSse,
 		ID:        so.ID,
-		Start:     toUTC(&so.Start.Time),
-		End:       toUTC(&so.End.Time),
+		Start:     toUTC(start),
+		End:       toUTC(end),
 		Postcodes: postcodes,
 	}
 }

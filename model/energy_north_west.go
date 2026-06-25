@@ -29,13 +29,18 @@ type EnergyNorthWestOutages struct {
 
 type EnergyNorthWestOutage struct {
 	ID           string               `json:"faultNumber"`
-	Start        EnergyNorthWestTime  `json:"date"`
+	Start        *EnergyNorthWestTime `json:"date"`
 	EstimatedEnd *EnergyNorthWestTime `json:"estimatedTimeOfRestoration"`
 	ActualEnd    *EnergyNorthWestTime `json:"actualTimeOfRestoration"`
 	Postcodes    Postcodes            `json:"AffectedPostcodes"`
 }
 
 func (enw EnergyNorthWestOutage) ToOutage() Outage {
+	var start *time.Time
+	if enw.Start != nil {
+		start = &enw.Start.Time
+	}
+
 	var end *time.Time
 	if enw.ActualEnd != nil {
 		end = &enw.ActualEnd.Time
@@ -46,7 +51,7 @@ func (enw EnergyNorthWestOutage) ToOutage() Outage {
 	return Outage{
 		DNO:       DnoEnergyNorthWest,
 		ID:        enw.ID,
-		Start:     toUTC(&enw.Start.Time),
+		Start:     toUTC(start),
 		End:       toUTC(end),
 		Postcodes: enw.Postcodes,
 	}

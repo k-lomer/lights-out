@@ -45,7 +45,6 @@ type NationalGridOutage struct {
 }
 
 func (ngo NationalGridOutage) ToOutage() Outage {
-
 	return Outage{
 		DNO:       DnoNationalGridDistribution,
 		ID:        ngo.ID,

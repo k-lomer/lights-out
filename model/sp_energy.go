@@ -49,24 +49,30 @@ type SPEnergyOutages struct {
 }
 
 type SPEnergyOutage struct {
-	ID           string            `json:"incidentReference"`
-	Start        SPEnergyStartTime `json:"createdDate"`
-	EstimatedEnd SPEnergyEndTime   `json:"estimatedFix"`
-	ActualEnd    *SPEnergyEndTime  `json:"actualRestorationTime"`
-	Postcodes    Postcodes         `json:"postcodeList"`
+	ID           string             `json:"incidentReference"`
+	Start        *SPEnergyStartTime `json:"createdDate"`
+	EstimatedEnd *SPEnergyEndTime   `json:"estimatedFix"`
+	ActualEnd    *SPEnergyEndTime   `json:"actualRestorationTime"`
+	Postcodes    Postcodes          `json:"postcodeList"`
 }
 
 func (speo SPEnergyOutage) ToOutage() Outage {
+	var start *time.Time
+	if speo.Start != nil {
+		start = &speo.Start.Time
+	}
+
 	var end *time.Time
 	if speo.ActualEnd != nil {
 		end = &speo.ActualEnd.Time
-	} else {
+	} else if speo.EstimatedEnd != nil {
 		end = &speo.EstimatedEnd.Time
 	}
+
 	return Outage{
 		DNO:       DnoSPEnergy,
 		ID:        speo.ID,
-		Start:     toUTC(&speo.Start.Time),
+		Start:     toUTC(start),
 		End:       toUTC(end),
 		Postcodes: speo.Postcodes,
 	}
