@@ -77,22 +77,7 @@ func (lh ListHandler) getOutages(ctx context.Context, qp model.QueryParams) ([]m
 	slices.SortFunc(totalOutages, model.KeyComp)
 
 	// Filter by postcode.
-	if len(qp.Postcodes) > 0 {
-		hash := qp.Postcodes.GetHashMap()
-
-		totalOutages = slices.Collect(func(yield func(model.Outage) bool) {
-			for _, o := range totalOutages {
-				for _, p := range o.Postcodes {
-					if hash[p] {
-						if !yield(o) {
-							return
-						}
-						break
-					}
-				}
-			}
-		})
-	}
+	totalOutages = model.FilterByPostcodes(totalOutages, qp.Postcodes)
 
 	// Page size 0 means return all results.
 	if qp.PageSize == 0 {

@@ -3,6 +3,7 @@ package model
 import (
 	"cmp"
 	"net/url"
+	"slices"
 	"time"
 )
 
@@ -30,4 +31,26 @@ func AggregateOutages(outages [][]Outage) []Outage {
 
 func KeyComp(o1, o2 Outage) int {
 	return cmp.Compare(o1.GetKey(), o2.GetKey())
+}
+
+func FilterByPostcodes(outages []Outage, postcodes Postcodes) []Outage {
+	// An empty postcode list leaves the outages unchanged.
+	if len(postcodes) == 0 {
+		return outages
+	}
+
+	hash := postcodes.GetHashMap()
+
+	return slices.Collect(func(yield func(Outage) bool) {
+		for _, o := range outages {
+			for _, p := range o.Postcodes {
+				if hash[p] {
+					if !yield(o) {
+						return
+					}
+					break
+				}
+			}
+		}
+	})
 }
