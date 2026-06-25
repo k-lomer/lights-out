@@ -23,7 +23,7 @@ func NewPostcode(s string) (Postcode, error) {
 	p = strings.ReplaceAll(p, "]", "")
 
 	if len(p) < 5 {
-		return "", fmt.Errorf("invalid postcode length: '%s", s)
+		return "", fmt.Errorf("invalid postcode length: '%s'", s)
 	}
 	p = strings.ToUpper(p)
 
