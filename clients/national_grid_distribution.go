@@ -43,12 +43,12 @@ func (client NationalGridDistributionClient) ListOutages(ctx context.Context) ([
 	if res.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("unexpected return code from NationalGridDistribution, %d", res.StatusCode)
 	}
-	var powercuts model.NationalGridPowercuts
-	err = json.NewDecoder(res.Body).Decode(&powercuts)
+	var outages model.NationalGridOutages
+	err = json.NewDecoder(res.Body).Decode(&outages)
 	if err != nil {
 		return nil, err
 	}
 
 	// Convert to Outage model
-	return powercuts.ToOutages(), nil
+	return outages.ToOutages(), nil
 }

@@ -21,31 +21,31 @@ func (st *SseTime) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-type SseFaults struct {
-	Faults []SseFault `json:"Faults"`
+type SseOutages struct {
+	Outages []SseOutage `json:"Faults"`
 }
 
-type SseFault struct {
+type SseOutage struct {
 	ID        string   `json:"UUID"`
 	Start     SseTime  `json:"loggedAt"`
 	End       SseTime  `json:"estimatedRestoration"`
 	Postcodes []string `json:"affectedAreas"`
 }
 
-func (sf SseFault) ToOutage() Outage {
-	postcodes, _ := ParsePostcodes(sf.Postcodes, false)
+func (so SseOutage) ToOutage() Outage {
+	postcodes, _ := ParsePostcodes(so.Postcodes, false)
 	return Outage{
 		DNO:       DnoSse,
-		ID:        sf.ID,
-		Start:     &sf.Start.Time,
-		End:       &sf.End.Time,
+		ID:        so.ID,
+		Start:     &so.Start.Time,
+		End:       &so.End.Time,
 		Postcodes: postcodes,
 	}
 }
 
-func (sf SseFaults) ToOutages() []Outage {
-	outages := make([]Outage, len(sf.Faults))
-	for i, f := range sf.Faults {
+func (so SseOutages) ToOutages() []Outage {
+	outages := make([]Outage, len(so.Outages))
+	for i, f := range so.Outages {
 		outages[i] = f.ToOutage()
 	}
 	return outages

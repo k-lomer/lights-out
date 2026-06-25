@@ -36,7 +36,7 @@ func (u *ukpnTimeMs) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-type UKPowerNetworkIncident struct {
+type UKPowerNetworkOutage struct {
 	ID        string      `json:"IncidentReference"`
 	Start     ukpnTime    `json:"CreationDateTime"`
 	Restored  *ukpnTimeMs `json:"RestoredDateTime"`
@@ -44,29 +44,29 @@ type UKPowerNetworkIncident struct {
 	Postcodes []string    `json:"FullPostcodeData"`
 }
 
-func (ukpni UKPowerNetworkIncident) ToOutage() Outage {
+func (ukpno UKPowerNetworkOutage) ToOutage() Outage {
 	var endTime *time.Time
-	if ukpni.Restored != nil {
-		endTime = &ukpni.Restored.Time
-	} else if ukpni.Estimated != nil {
-		endTime = &ukpni.Estimated.Time
+	if ukpno.Restored != nil {
+		endTime = &ukpno.Restored.Time
+	} else if ukpno.Estimated != nil {
+		endTime = &ukpno.Estimated.Time
 	}
-	postcodes, _ := ParsePostcodes(ukpni.Postcodes, false)
+	postcodes, _ := ParsePostcodes(ukpno.Postcodes, false)
 
 	return Outage{
 		DNO:       DnoUKPowerNetwork,
-		ID:        ukpni.ID,
-		Start:     &ukpni.Start.Time,
+		ID:        ukpno.ID,
+		Start:     &ukpno.Start.Time,
 		End:       endTime,
 		Postcodes: postcodes,
 	}
 }
 
-func UKPowerNetworkIncidentsToOutages(ukpnis []UKPowerNetworkIncident) []Outage {
+func UKPowerNetworkToOutages(ukpnos []UKPowerNetworkOutage) []Outage {
 	var outages []Outage
 
-	for _, incident := range ukpnis {
-		outages = append(outages, incident.ToOutage())
+	for _, outage := range ukpnos {
+		outages = append(outages, outage.ToOutage())
 	}
 
 	return outages

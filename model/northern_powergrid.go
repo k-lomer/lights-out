@@ -33,37 +33,37 @@ func (o *OptionalNorthernPowergridTime) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-type NorthernPowergridPowercut struct {
+type NorthernPowergridOutage struct {
 	ID       string                        `json:"Reference"`
 	Start    time.Time                     `json:"LoggedTime"`
 	End      OptionalNorthernPowergridTime `json:"EstimatedTimeTillResolution"`
 	Postcode Postcode                      `json:"Postcode"`
 }
 
-func (npp NorthernPowergridPowercut) ToOutage() Outage {
+func (npo NorthernPowergridOutage) ToOutage() Outage {
 	return Outage{
 		DNO:       DnoNorthernPowergrid,
-		ID:        npp.ID,
-		Start:     &npp.Start,
-		End:       npp.End.Time,
-		Postcodes: []Postcode{npp.Postcode},
+		ID:        npo.ID,
+		Start:     &npo.Start,
+		End:       npo.End.Time,
+		Postcodes: []Postcode{npo.Postcode},
 	}
 }
 
-func (npp NorthernPowergridPowercut) getKey() string {
-	return npp.ID + npp.Start.String() + npp.End.String()
+func (npo NorthernPowergridOutage) getKey() string {
+	return npo.ID + npo.Start.String() + npo.End.String()
 }
 
-func NorthernPowergridPowercutsToOutages(npps []NorthernPowergridPowercut) []Outage {
+func NorthernPowergridToOutages(npos []NorthernPowergridOutage) []Outage {
 	outages := map[string]Outage{}
-	for _, npp := range npps {
-		k := npp.getKey()
+	for _, npo := range npos {
+		k := npo.getKey()
 		v, ok := outages[k]
 		if ok {
-			v.Postcodes = append(v.Postcodes, npp.Postcode)
+			v.Postcodes = append(v.Postcodes, npo.Postcode)
 			outages[k] = v
 		} else {
-			outages[k] = npp.ToOutage()
+			outages[k] = npo.ToOutage()
 		}
 	}
 	return slices.Collect(maps.Values(outages))

@@ -28,7 +28,7 @@ func (client SPEnergyClient) GetDno() model.Dno {
 	return model.DnoSPEnergy
 }
 
-func (client SPEnergyClient) getIncidentCount(ctx context.Context) (int, error) {
+func (client SPEnergyClient) getOutageCount(ctx context.Context) (int, error) {
 	body := `{"namespace":"","classname":"@udd/01pSr000002yGTp","method":"getImpactDataCount","isContinuation":false,"params":{"postcode":"","statuses":[]},"cacheable":false}`
 	req, err := http.NewRequestWithContext(ctx,
 		http.MethodPost, apiBaseUrlSPEnergy+apiRouteSPEnergyExecute, strings.NewReader(body))
@@ -57,7 +57,7 @@ func (client SPEnergyClient) getIncidentCount(ctx context.Context) (int, error) 
 	return result.Count, nil
 }
 
-func (client SPEnergyClient) getIncidents(ctx context.Context, count int) (*model.SPEnergyIncidents, error) {
+func (client SPEnergyClient) getOutages(ctx context.Context, count int) (*model.SPEnergyOutages, error) {
 	body := `{"namespace":"","classname":"@udd/01pSr000002yGTp","method":"getImpactData","isContinuation":false,"params":{"paramsJson":"{\"postcode\":\"\",\"pageNumber\":1,\"pageSize\":` + strconv.Itoa(count) + `,\"statuses\":[]}"},"cacheable":false}`
 	req, err := http.NewRequestWithContext(ctx,
 		http.MethodPost, apiBaseUrlSPEnergy+apiRouteSPEnergyExecute, strings.NewReader(body))
@@ -74,18 +74,18 @@ func (client SPEnergyClient) getIncidents(ctx context.Context, count int) (*mode
 	if res.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("unexpected return code from SPEnergy, %d", res.StatusCode)
 	}
-	var incidents model.SPEnergyIncidents
-	err = json.NewDecoder(res.Body).Decode(&incidents)
+	var outages model.SPEnergyOutages
+	err = json.NewDecoder(res.Body).Decode(&outages)
 	if err != nil {
 		return nil, err
 	}
 
-	return &incidents, nil
+	return &outages, nil
 }
 
 func (client SPEnergyClient) ListOutages(ctx context.Context) ([]model.Outage, error) {
 
-	count, err := client.getIncidentCount(ctx)
+	count, err := client.getOutageCount(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -93,10 +93,10 @@ func (client SPEnergyClient) ListOutages(ctx context.Context) ([]model.Outage, e
 		return []model.Outage{}, nil
 	}
 
-	incidents, err := client.getIncidents(ctx, count)
+	outages, err := client.getOutages(ctx, count)
 	if err != nil {
 		return nil, err
 	}
 
-	return incidents.ToOutages(), nil
+	return outages.ToOutages(), nil
 }

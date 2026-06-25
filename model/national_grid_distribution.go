@@ -33,31 +33,31 @@ func (o *OptionalNationalGridTime) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-type NationalGridPowercuts struct {
-	Incidents []NationalGridPowercut `json:"incidents"`
+type NationalGridOutages struct {
+	Outages []NationalGridOutage `json:"incidents"`
 }
 
-type NationalGridPowercut struct {
+type NationalGridOutage struct {
 	ID        string                   `json:"id"`
 	Start     OptionalNationalGridTime `json:"startTime"`
 	End       OptionalNationalGridTime `json:"etr"`
 	Postcodes Postcodes                `json:"postcodes"`
 }
 
-func (ngp NationalGridPowercut) ToOutage() Outage {
+func (ngo NationalGridOutage) ToOutage() Outage {
 
 	return Outage{
 		DNO:       DnoNationalGridDistribution,
-		ID:        ngp.ID,
-		Start:     ngp.Start.Time,
-		End:       ngp.End.Time,
-		Postcodes: ngp.Postcodes,
+		ID:        ngo.ID,
+		Start:     ngo.Start.Time,
+		End:       ngo.End.Time,
+		Postcodes: ngo.Postcodes,
 	}
 }
 
-func (ngp NationalGridPowercuts) ToOutages() []Outage {
-	outages := make([]Outage, len(ngp.Incidents))
-	for i, f := range ngp.Incidents {
+func (ngo NationalGridOutages) ToOutages() []Outage {
+	outages := make([]Outage, len(ngo.Outages))
+	for i, f := range ngo.Outages {
 		outages[i] = f.ToOutage()
 	}
 	return outages

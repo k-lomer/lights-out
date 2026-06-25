@@ -43,12 +43,12 @@ func (client SseClient) ListOutages(ctx context.Context) ([]model.Outage, error)
 	if res.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("unexpected return code from SSE, %d", res.StatusCode)
 	}
-	var liveFaults model.SseFaults
-	err = json.NewDecoder(res.Body).Decode(&liveFaults)
+	var liveOutages model.SseOutages
+	err = json.NewDecoder(res.Body).Decode(&liveOutages)
 	if err != nil {
 		return nil, err
 	}
 
 	// Convert to Outage model
-	return liveFaults.ToOutages(), nil
+	return liveOutages.ToOutages(), nil
 }

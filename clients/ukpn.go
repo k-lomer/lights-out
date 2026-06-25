@@ -47,12 +47,12 @@ func (client UKPowerNetworkClient) ListOutages(ctx context.Context) ([]model.Out
 	if res.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("unexpected return code from UKPN, %d", res.StatusCode)
 	}
-	var incidents []model.UKPowerNetworkIncident
-	err = json.NewDecoder(res.Body).Decode(&incidents)
+	var outages []model.UKPowerNetworkOutage
+	err = json.NewDecoder(res.Body).Decode(&outages)
 	if err != nil {
 		return nil, err
 	}
 
 	// Convert to Outage model
-	return model.UKPowerNetworkIncidentsToOutages(incidents), nil
+	return model.UKPowerNetworkToOutages(outages), nil
 }

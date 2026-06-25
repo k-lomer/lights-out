@@ -44,11 +44,11 @@ func (t *SPEnergyEndTime) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-type SPEnergyIncidents struct {
-	Incidents []SPEnergyIncident `json:"returnValue"`
+type SPEnergyOutages struct {
+	Outages []SPEnergyOutage `json:"returnValue"`
 }
 
-type SPEnergyIncident struct {
+type SPEnergyOutage struct {
 	ID           string            `json:"incidentReference"`
 	Start        SPEnergyStartTime `json:"CreatedDate"`
 	EstimatedEnd SPEnergyEndTime   `json:"estimatedFix"`
@@ -56,25 +56,25 @@ type SPEnergyIncident struct {
 	Postcodes    Postcodes         `json:"postcodeList"`
 }
 
-func (spei SPEnergyIncident) ToOutage() Outage {
+func (speo SPEnergyOutage) ToOutage() Outage {
 	var end *time.Time
-	if spei.ActualEnd != nil {
-		end = &spei.ActualEnd.Time
+	if speo.ActualEnd != nil {
+		end = &speo.ActualEnd.Time
 	} else {
-		end = &spei.EstimatedEnd.Time
+		end = &speo.EstimatedEnd.Time
 	}
 	return Outage{
 		DNO:       DnoSPEnergy,
-		ID:        spei.ID,
-		Start:     &spei.Start.Time,
+		ID:        speo.ID,
+		Start:     &speo.Start.Time,
 		End:       end,
-		Postcodes: spei.Postcodes,
+		Postcodes: speo.Postcodes,
 	}
 }
 
-func (spei SPEnergyIncidents) ToOutages() []Outage {
-	outages := make([]Outage, len(spei.Incidents))
-	for i, f := range spei.Incidents {
+func (speo SPEnergyOutages) ToOutages() []Outage {
+	outages := make([]Outage, len(speo.Outages))
+	for i, f := range speo.Outages {
 		outages[i] = f.ToOutage()
 	}
 	return outages

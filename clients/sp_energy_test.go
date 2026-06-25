@@ -15,7 +15,7 @@ import (
 // This can be checked with `openssl s_client -connect powercuts.spenergynetworks.co.uk:443 -showcerts`
 // Use InsecureSkipVerify = true to ignore the incomplete certificate chain (missing intermediate certificates)
 
-func Test_getSPEnergyIncidentCount(t *testing.T) {
+func Test_getSPEnergyOutageCount(t *testing.T) {
 	ctx := context.Background()
 	var client = &http.Client{
 		Timeout: 30 * time.Second,
@@ -23,12 +23,12 @@ func Test_getSPEnergyIncidentCount(t *testing.T) {
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		},
 	}
-	count, err := MakeSPEnergyClient(client).getIncidentCount(ctx)
+	count, err := MakeSPEnergyClient(client).getOutageCount(ctx)
 	assert.NoError(t, err)
 	assert.NotZero(t, count)
 }
 
-func Test_getSPEnergyIncidents(t *testing.T) {
+func Test_getSPEnergyOutages(t *testing.T) {
 	ctx := context.Background()
 	var client = &http.Client{
 		Timeout: 30 * time.Second,
@@ -36,10 +36,10 @@ func Test_getSPEnergyIncidents(t *testing.T) {
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		},
 	}
-	incidents, err := MakeSPEnergyClient(client).getIncidents(ctx, 2)
+	outages, err := MakeSPEnergyClient(client).getOutages(ctx, 2)
 	assert.NoError(t, err)
-	assert.NotNil(t, incidents)
-	assert.Len(t, incidents.Incidents, 2)
+	assert.NotNil(t, outages)
+	assert.Len(t, outages.Outages, 2)
 }
 
 func Test_ListSPEnergyOutages(t *testing.T) {
