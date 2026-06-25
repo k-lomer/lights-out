@@ -11,7 +11,7 @@ var ukLocation, _ = time.LoadLocation("Europe/London")
 type Outage struct {
 	DNO       Dno        `json:"dno"`
 	ID        string     `json:"id"`
-	Start     time.Time  `json:"start_time"`
+	Start     *time.Time `json:"start_time"`
 	End       *time.Time `json:"end_time"`
 	Postcodes Postcodes  `json:"postcodes"`
 }

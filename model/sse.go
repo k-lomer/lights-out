@@ -37,7 +37,7 @@ func (sf SseFault) ToOutage() Outage {
 	return Outage{
 		DNO:       DnoSse,
 		ID:        sf.ID,
-		Start:     sf.Start.Time,
+		Start:     &sf.Start.Time,
 		End:       &sf.End.Time,
 		Postcodes: postcodes,
 	}

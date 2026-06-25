@@ -49,7 +49,7 @@ func (ngp NationalGridPowercut) ToOutage() Outage {
 	return Outage{
 		DNO:       DnoNationalGridDistribution,
 		ID:        ngp.ID,
-		Start:     *ngp.Start.Time,
+		Start:     ngp.Start.Time,
 		End:       ngp.End.Time,
 		Postcodes: ngp.Postcodes,
 	}

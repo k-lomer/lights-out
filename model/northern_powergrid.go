@@ -44,7 +44,7 @@ func (npp NorthernPowergridPowercut) ToOutage() Outage {
 	return Outage{
 		DNO:       DnoNorthernPowergrid,
 		ID:        npp.ID,
-		Start:     npp.Start,
+		Start:     &npp.Start,
 		End:       npp.End.Time,
 		Postcodes: []Postcode{npp.Postcode},
 	}

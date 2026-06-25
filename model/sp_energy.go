@@ -66,7 +66,7 @@ func (spei SPEnergyIncident) ToOutage() Outage {
 	return Outage{
 		DNO:       DnoSPEnergy,
 		ID:        spei.ID,
-		Start:     spei.Start.Time,
+		Start:     &spei.Start.Time,
 		End:       end,
 		Postcodes: spei.Postcodes,
 	}
