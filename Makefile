@@ -13,5 +13,7 @@ lint:
 test:
 	go clean -testcache
 	go test ./...
+coverage:
+	go test -cover ./...
 clean:
 	rm -rf bin/
