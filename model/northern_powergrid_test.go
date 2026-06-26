@@ -15,7 +15,7 @@ var northernPowergridFixture []byte
 
 // Test that the real captured Northern Powergrid payload decodes and converts cleanly.
 func Test_NorthernPowergrid_RealData(t *testing.T) {
-	var outages []NorthernPowergridOutage
+	var outages NorthernPowergridOutages
 	require.NoError(t, json.Unmarshal(northernPowergridFixture, &outages))
 
 	got := NorthernPowergridToOutages(outages)
@@ -28,7 +28,7 @@ func Test_NorthernPowergrid_RealData(t *testing.T) {
 
 // Test that the real duplicate-reference rows merge into one outage with every postcode.
 func Test_NorthernPowergrid_RealDataMerge(t *testing.T) {
-	var outages []NorthernPowergridOutage
+	var outages NorthernPowergridOutages
 	require.NoError(t, json.Unmarshal(northernPowergridFixture, &outages))
 
 	got := NorthernPowergridToOutages(outages)
@@ -41,6 +41,18 @@ func Test_NorthernPowergrid_RealDataMerge(t *testing.T) {
 	}
 	require.NotNil(t, merged)
 	assert.ElementsMatch(t, Postcodes{"NE34 0JA", "NE34 0HX", "NE34 0HU"}, merged.Postcodes)
+}
+
+// Test that an outage with an unparseable time is skipped, not the whole batch.
+func Test_NorthernPowergrid_SkipsUndecodableOutage(t *testing.T) {
+	var outages NorthernPowergridOutages
+	require.NoError(t, json.Unmarshal([]byte(`[
+		{"Reference": "NPG-good", "LoggedTime": "2026-06-25T13:00:00Z", "EstimatedTimeTillResolution": "2026-06-25T18:00:00Z", "Postcode": "NE34 0JA"},
+		{"Reference": "NPG-bad", "LoggedTime": "2026-06-25T13:00:00Z", "EstimatedTimeTillResolution": "not a time", "Postcode": "NE34 0HX"}
+	]`), &outages))
+
+	require.Len(t, outages, 1)
+	assert.Equal(t, "NPG-good", outages[0].ID)
 }
 
 // Test that a single outage wraps its lone postcode and parses both times.
@@ -78,7 +90,7 @@ func Test_NorthernPowergrid_SentinelEnd(t *testing.T) {
 
 // Test that rows sharing reference, start and end merge into one outage with all postcodes.
 func Test_NorthernPowergrid_MergesDuplicates(t *testing.T) {
-	var outages []NorthernPowergridOutage
+	var outages NorthernPowergridOutages
 	require.NoError(t, json.Unmarshal([]byte(`[
 		{"Reference": "NPG-3", "LoggedTime": "2026-06-25T13:00:00Z", "EstimatedTimeTillResolution": "2026-06-25T18:00:00Z", "Postcode": "NE34 0JA"},
 		{"Reference": "NPG-3", "LoggedTime": "2026-06-25T13:00:00Z", "EstimatedTimeTillResolution": "2026-06-25T18:00:00Z", "Postcode": "NE34 0HX"}
@@ -93,7 +105,7 @@ func Test_NorthernPowergrid_MergesDuplicates(t *testing.T) {
 
 // Test that rows differing only in resolution time are kept as separate outages.
 func Test_NorthernPowergrid_DistinctKeysNotMerged(t *testing.T) {
-	var outages []NorthernPowergridOutage
+	var outages NorthernPowergridOutages
 	require.NoError(t, json.Unmarshal([]byte(`[
 		{"Reference": "NPG-4", "LoggedTime": "2026-06-25T13:00:00Z", "EstimatedTimeTillResolution": "2026-06-25T18:00:00Z", "Postcode": "NE34 0JA"},
 		{"Reference": "NPG-4", "LoggedTime": "2026-06-25T13:00:00Z", "EstimatedTimeTillResolution": "2026-06-25T19:00:00Z", "Postcode": "NE34 0HX"}

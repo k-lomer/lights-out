@@ -1,6 +1,7 @@
 package model
 
 import (
+	"encoding/json"
 	"maps"
 	"slices"
 	"strings"
@@ -33,6 +34,17 @@ func (o *OptionalNorthernPowergridTime) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+type NorthernPowergridOutages []NorthernPowergridOutage
+
+func (n *NorthernPowergridOutages) UnmarshalJSON(data []byte) error {
+	var raws []json.RawMessage
+	if err := json.Unmarshal(data, &raws); err != nil {
+		return err
+	}
+	*n = decodeOutages[NorthernPowergridOutage](raws, DnoNorthernPowergrid)
+	return nil
+}
+
 type NorthernPowergridOutage struct {
 	ID       string                        `json:"Reference"`
 	Start    *time.Time                    `json:"LoggedTime"`
@@ -58,7 +70,7 @@ func (npo NorthernPowergridOutage) getKey() string {
 	return npo.ID + start + npo.End.String()
 }
 
-func NorthernPowergridToOutages(npos []NorthernPowergridOutage) []Outage {
+func NorthernPowergridToOutages(npos NorthernPowergridOutages) []Outage {
 	outages := map[string]Outage{}
 	for _, npo := range npos {
 		k := npo.getKey()

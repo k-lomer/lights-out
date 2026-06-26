@@ -1,6 +1,7 @@
 package model
 
 import (
+	"encoding/json"
 	"strings"
 	"time"
 )
@@ -46,6 +47,17 @@ func (t *SPEnergyEndTime) UnmarshalJSON(data []byte) error {
 
 type SPEnergyOutages struct {
 	Outages []SPEnergyOutage `json:"returnValue"`
+}
+
+func (speo *SPEnergyOutages) UnmarshalJSON(data []byte) error {
+	var raw struct {
+		ReturnValue []json.RawMessage `json:"returnValue"`
+	}
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	speo.Outages = decodeOutages[SPEnergyOutage](raw.ReturnValue, DnoSPEnergy)
+	return nil
 }
 
 type SPEnergyOutage struct {

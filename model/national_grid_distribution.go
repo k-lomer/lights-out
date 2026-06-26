@@ -1,6 +1,7 @@
 package model
 
 import (
+	"encoding/json"
 	"strings"
 	"time"
 )
@@ -35,6 +36,17 @@ func (o *OptionalNationalGridTime) UnmarshalJSON(data []byte) error {
 
 type NationalGridOutages struct {
 	Outages []NationalGridOutage `json:"incidents"`
+}
+
+func (ngo *NationalGridOutages) UnmarshalJSON(data []byte) error {
+	var raw struct {
+		Incidents []json.RawMessage `json:"incidents"`
+	}
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	ngo.Outages = decodeOutages[NationalGridOutage](raw.Incidents, DnoNationalGridDistribution)
+	return nil
 }
 
 type NationalGridOutage struct {

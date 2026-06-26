@@ -30,6 +30,18 @@ func Test_Sse_RealData(t *testing.T) {
 	}
 }
 
+// Test that an outage with an unparseable time is skipped, not the whole batch.
+func Test_Sse_SkipsUndecodableOutage(t *testing.T) {
+	var outages SseOutages
+	require.NoError(t, json.Unmarshal([]byte(`{"Faults": [
+		{"UUID": "sse-good", "loggedAt": "2026-06-25T11:00:00.000+0000", "estimatedRestoration": "2026-06-26T00:00:00.000+0000", "affectedAreas": ["HP13 7DZ"]},
+		{"UUID": "sse-bad", "loggedAt": "not a time", "estimatedRestoration": "2026-06-26T00:00:00.000+0000", "affectedAreas": ["HP13 7DZ"]}
+	]}`), &outages))
+
+	require.Len(t, outages.Outages, 1)
+	assert.Equal(t, "sse-good", outages.Outages[0].ID)
+}
+
 // Test that the timezone-offset layout is parsed for both times.
 func Test_Sse_ParsesTimes(t *testing.T) {
 	var o SseOutage

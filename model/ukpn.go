@@ -1,6 +1,7 @@
 package model
 
 import (
+	"encoding/json"
 	"strings"
 	"time"
 )
@@ -36,6 +37,17 @@ func (u *ukpnTimeMs) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+type UKPowerNetworkOutages []UKPowerNetworkOutage
+
+func (u *UKPowerNetworkOutages) UnmarshalJSON(data []byte) error {
+	var raws []json.RawMessage
+	if err := json.Unmarshal(data, &raws); err != nil {
+		return err
+	}
+	*u = decodeOutages[UKPowerNetworkOutage](raws, DnoUKPowerNetwork)
+	return nil
+}
+
 type UKPowerNetworkOutage struct {
 	ID        string      `json:"IncidentReference"`
 	Start     *ukpnTime   `json:"CreationDateTime"`
@@ -67,7 +79,7 @@ func (ukpno UKPowerNetworkOutage) ToOutage() Outage {
 	}
 }
 
-func UKPowerNetworkToOutages(ukpnos []UKPowerNetworkOutage) []Outage {
+func UKPowerNetworkToOutages(ukpnos UKPowerNetworkOutages) []Outage {
 	var outages []Outage
 
 	for _, outage := range ukpnos {

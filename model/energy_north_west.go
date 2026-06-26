@@ -1,6 +1,7 @@
 package model
 
 import (
+	"encoding/json"
 	"strings"
 	"time"
 )
@@ -25,6 +26,19 @@ func (t *EnergyNorthWestTime) UnmarshalJSON(data []byte) error {
 type EnergyNorthWestOutages struct {
 	Outages      []EnergyNorthWestOutage `json:"Items"`
 	TotalOutages int                     `json:"TotalResults"`
+}
+
+func (enwo *EnergyNorthWestOutages) UnmarshalJSON(data []byte) error {
+	var raw struct {
+		Items        []json.RawMessage `json:"Items"`
+		TotalResults int               `json:"TotalResults"`
+	}
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	enwo.TotalOutages = raw.TotalResults
+	enwo.Outages = decodeOutages[EnergyNorthWestOutage](raw.Items, DnoEnergyNorthWest)
+	return nil
 }
 
 type EnergyNorthWestOutage struct {

@@ -23,7 +23,7 @@ func ukpnExpectedTime(t *testing.T, layout, s string) time.Time {
 
 // Test that the real captured UKPN payload decodes and converts cleanly.
 func Test_UKPowerNetwork_RealData(t *testing.T) {
-	var outages []UKPowerNetworkOutage
+	var outages UKPowerNetworkOutages
 	require.NoError(t, json.Unmarshal(ukpnFixture, &outages))
 
 	got := UKPowerNetworkToOutages(outages)
@@ -31,6 +31,18 @@ func Test_UKPowerNetwork_RealData(t *testing.T) {
 	require.NotEmpty(t, got)
 	assert.Len(t, got, len(outages))
 	assertConverted(t, got, DnoUKPowerNetwork, true)
+}
+
+// Test that a single outage with an unparseable time is skipped, not the whole batch.
+func Test_UKPowerNetwork_SkipsUndecodableOutage(t *testing.T) {
+	var outages UKPowerNetworkOutages
+	require.NoError(t, json.Unmarshal([]byte(`[
+		{"IncidentReference": "UKPN-good", "CreationDateTime": "2026-06-25T16:36:34", "FullPostcodeData": ["N166RJ"]},
+		{"IncidentReference": "UKPN-bad", "CreationDateTime": "not a time", "FullPostcodeData": ["N166RJ"]}
+	]`), &outages))
+
+	require.Len(t, outages, 1)
+	assert.Equal(t, "UKPN-good", outages[0].ID)
 }
 
 // Test that the restored time (millisecond layout) is preferred for the end time.

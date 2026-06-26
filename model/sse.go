@@ -1,6 +1,7 @@
 package model
 
 import (
+	"encoding/json"
 	"strings"
 	"time"
 )
@@ -23,6 +24,17 @@ func (st *SseTime) UnmarshalJSON(data []byte) error {
 
 type SseOutages struct {
 	Outages []SseOutage `json:"Faults"`
+}
+
+func (so *SseOutages) UnmarshalJSON(data []byte) error {
+	var raw struct {
+		Faults []json.RawMessage `json:"Faults"`
+	}
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	so.Outages = decodeOutages[SseOutage](raw.Faults, DnoSse)
+	return nil
 }
 
 type SseOutage struct {
