@@ -33,11 +33,13 @@ type KvStore struct {
 	lock  sync.RWMutex
 }
 
-func MakeKvStore(ttl time.Duration) KvStore {
-	return KvStore{
+func MakeKvStore(ttl time.Duration) *KvStore {
+	kvStore := KvStore{
 		store: make(map[string]ValueExt),
 		ttl:   ttl,
 	}
+
+	return &kvStore
 }
 
 func (kv *KvStore) Set(k string, v string) {
