@@ -38,7 +38,7 @@ func (lh ListHandler) getOutages(ctx context.Context, qp model.QueryParams) ([]m
 
 	dnoOutages := make([][]model.Outage, len(dnoClients))
 	dnoErrs := make([]error, len(dnoClients))
-	ctx, cancel := context.WithTimeout(ctx, time.Duration(8*time.Second))
+	ctx, cancel := context.WithTimeout(ctx, 8*time.Second)
 	defer cancel()
 	var wg sync.WaitGroup
 
