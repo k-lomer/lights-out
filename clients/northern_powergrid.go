@@ -13,12 +13,14 @@ const apiBaseUrlNorthernPowergrid = "https://power.northernpowergrid.com"
 const apiRoutePowercutsNorthernPowergrid = "/Powercut_API/rest/powercuts/getall"
 
 type NorthernPowergridClient struct {
+	*UpdateTracker
 	httpClient *http.Client
 }
 
 func MakeNorthernPowergridClient(client *http.Client) NorthernPowergridClient {
 	return NorthernPowergridClient{
-		httpClient: client,
+		UpdateTracker: &UpdateTracker{},
+		httpClient:    client,
 	}
 }
 

@@ -11,14 +11,16 @@ import (
 )
 
 type TestDnoClient struct {
+	*clients.UpdateTracker
 	Dno        model.Dno
 	NumOutages int
 }
 
 func NewTestDnoClient(dno model.Dno, numOutages int) TestDnoClient {
 	return TestDnoClient{
-		dno,
-		numOutages,
+		UpdateTracker: &clients.UpdateTracker{},
+		Dno:           dno,
+		NumOutages:    numOutages,
 	}
 }
 

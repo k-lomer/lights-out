@@ -13,12 +13,14 @@ const apiBaseUrlSse = "https://ssen-powertrack-api.opcld.com"
 const apiRouteSseLiveFaults = "/gridiview/reporter/info/livefaults"
 
 type SseClient struct {
+	*UpdateTracker
 	httpClient *http.Client
 }
 
 func MakeSseClient(client *http.Client) SseClient {
 	return SseClient{
-		httpClient: client,
+		UpdateTracker: &UpdateTracker{},
+		httpClient:    client,
 	}
 }
 

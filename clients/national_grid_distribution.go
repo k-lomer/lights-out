@@ -13,12 +13,14 @@ const apiBaseUrlNationalGridDistribution = "https://powercuts.nationalgrid.co.uk
 const apiRouteNationalGridDistribution = "/__powercuts/getTabularView"
 
 type NationalGridDistributionClient struct {
+	*UpdateTracker
 	httpClient *http.Client
 }
 
 func MakeNationalGridDistributionClient(client *http.Client) NationalGridDistributionClient {
 	return NationalGridDistributionClient{
-		httpClient: client,
+		UpdateTracker: &UpdateTracker{},
+		httpClient:    client,
 	}
 }
 

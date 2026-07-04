@@ -14,14 +14,16 @@ const apiBaseUrlEnergyNorthWest = "https://www.enwl.co.uk"
 const apiRouteEnergyNorthWest = "/api/power-outages/search"
 
 type EnergyNorthWestClient struct {
+	*UpdateTracker
 	httpClient *http.Client
 	pageSize   int
 }
 
 func MakeEnergyNorthWestClient(client *http.Client) EnergyNorthWestClient {
 	return EnergyNorthWestClient{
-		httpClient: client,
-		pageSize:   200, // Default value.
+		UpdateTracker: &UpdateTracker{},
+		httpClient:    client,
+		pageSize:      200, // Default value.
 	}
 }
 

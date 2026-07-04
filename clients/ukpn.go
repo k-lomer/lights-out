@@ -13,12 +13,14 @@ const apiBaseUrlUkpn = "https://www.ukpowernetworks.co.uk"
 const apiRouteUkpnIncidents = "/api/power-cut/all-incidents-light"
 
 type UKPowerNetworkClient struct {
+	*UpdateTracker
 	httpClient *http.Client
 }
 
 func MakeUKPowerNetworkClient(client *http.Client) UKPowerNetworkClient {
 	return UKPowerNetworkClient{
-		httpClient: client,
+		UpdateTracker: &UpdateTracker{},
+		httpClient:    client,
 	}
 }
 

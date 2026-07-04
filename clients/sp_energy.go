@@ -15,12 +15,14 @@ const apiBaseUrlSPEnergy = "https://powercuts.spenergynetworks.co.uk"
 const apiRouteSPEnergyExecute = "/webruntime/api/apex/execute?language=en-US&asGuest=true&htmlEncode=false"
 
 type SPEnergyClient struct {
+	*UpdateTracker
 	httpClient *http.Client
 }
 
 func MakeSPEnergyClient(client *http.Client) SPEnergyClient {
 	return SPEnergyClient{
-		httpClient: client,
+		UpdateTracker: &UpdateTracker{},
+		httpClient:    client,
 	}
 }
 
