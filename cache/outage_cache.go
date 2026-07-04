@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"sync"
 	"time"
+
+	"github.com/k-lomer/lights-out/model"
 )
 
 type ErrMissingKey struct {
@@ -23,48 +25,59 @@ func (e ErrExpiredValue) Error() string {
 }
 
 type ValueExt struct {
-	v       string
+	v       []model.Outage
 	updated time.Time
 }
 
-type KvStore struct {
+type OutageCache struct {
 	store map[string]ValueExt
 	ttl   time.Duration
 	lock  sync.RWMutex
 }
 
-func MakeKvStore(ttl time.Duration) *KvStore {
-	kvStore := KvStore{
+func MakeOutageCache(ttl time.Duration) *OutageCache {
+	outageCache := OutageCache{
 		store: make(map[string]ValueExt),
 		ttl:   ttl,
 	}
 
-	return &kvStore
+	return &outageCache
 }
 
-func (kv *KvStore) Set(k string, v string) {
-	kv.lock.Lock()
-	defer kv.lock.Unlock()
+func (c *OutageCache) GetTtl() time.Duration {
+	return c.ttl
+}
 
-	kv.store[k] = ValueExt{
+func (c *OutageCache) Set(k string, v []model.Outage) {
+	c.lock.Lock()
+	defer c.lock.Unlock()
+
+	c.store[k] = ValueExt{
 		v:       v,
 		updated: time.Now(),
 	}
 }
 
-func (kv *KvStore) Get(k string) (string, error) {
-	kv.lock.RLock()
-	defer kv.lock.RUnlock()
+func (c *OutageCache) Get(k string) ([]model.Outage, error) {
+	c.lock.RLock()
+	defer c.lock.RUnlock()
 
-	vExt, found := kv.store[k]
+	vExt, found := c.store[k]
 	if !found {
-		return "", ErrMissingKey{k}
+		return nil, ErrMissingKey{k}
 	}
 
 	elapsed := time.Since(vExt.updated)
-	if elapsed > kv.ttl {
+	if elapsed > c.ttl {
 		return vExt.v, ErrExpiredValue{k}
 	}
 
 	return vExt.v, nil
+}
+
+func (c *OutageCache) Delete(k string) {
+	c.lock.Lock()
+	defer c.lock.Unlock()
+
+	delete(c.store, k)
 }
