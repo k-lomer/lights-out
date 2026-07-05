@@ -8,12 +8,13 @@ import (
 
 const energyNorthWestTimeLayout = "2006-01-02T15:04:05"
 
-// Energy North West classifies every fault with an explicit type.
+type EnergyNorthWestOutageType string
+
 const (
-	energyNorthWestTypeCurrentFault       = "CurrentFault"
-	energyNorthWestTypeResolvedFault      = "ResolvedFault"
-	energyNorthWestTypeTodaysPlannedWorks = "TodaysPlannedWorks"
-	energyNorthWestTypeFuturePlannedWorks = "FuturePlannedWorks"
+	energyNorthWestCurrentFault       EnergyNorthWestOutageType = "CurrentFault"
+	energyNorthWestResolvedFault      EnergyNorthWestOutageType = "ResolvedFault"
+	energyNorthWestTodaysPlannedWorks EnergyNorthWestOutageType = "TodaysPlannedWorks"
+	energyNorthWestFuturePlannedWorks EnergyNorthWestOutageType = "FuturePlannedWorks"
 )
 
 type EnergyNorthWestTime struct {
@@ -50,12 +51,12 @@ func (enwo *EnergyNorthWestOutages) UnmarshalJSON(data []byte) error {
 }
 
 type EnergyNorthWestOutage struct {
-	ID           string               `json:"faultNumber"`
-	Type         string               `json:"Type"`
-	Start        *EnergyNorthWestTime `json:"date"`
-	EstimatedEnd *EnergyNorthWestTime `json:"estimatedTimeOfRestoration"`
-	ActualEnd    *EnergyNorthWestTime `json:"actualTimeOfRestoration"`
-	Postcodes    Postcodes            `json:"AffectedPostcodes"`
+	ID           string                    `json:"faultNumber"`
+	Type         EnergyNorthWestOutageType `json:"Type"`
+	Start        *EnergyNorthWestTime      `json:"date"`
+	EstimatedEnd *EnergyNorthWestTime      `json:"estimatedTimeOfRestoration"`
+	ActualEnd    *EnergyNorthWestTime      `json:"actualTimeOfRestoration"`
+	Postcodes    Postcodes                 `json:"AffectedPostcodes"`
 }
 
 func (enw EnergyNorthWestOutage) ToOutage() Outage {
@@ -89,11 +90,11 @@ func (enw EnergyNorthWestOutage) ToOutage() Outage {
 // or unrecognised types fall back to whether the power is already back on.
 func (enw EnergyNorthWestOutage) status(actualEnd *time.Time) Status {
 	switch enw.Type {
-	case energyNorthWestTypeCurrentFault:
+	case energyNorthWestCurrentFault, energyNorthWestTodaysPlannedWorks:
 		return StatusActive
-	case energyNorthWestTypeResolvedFault:
+	case energyNorthWestResolvedFault:
 		return StatusResolved
-	case energyNorthWestTypeTodaysPlannedWorks, energyNorthWestTypeFuturePlannedWorks:
+	case energyNorthWestFuturePlannedWorks:
 		return StatusPlanned
 	default:
 		if actualEnd != nil {

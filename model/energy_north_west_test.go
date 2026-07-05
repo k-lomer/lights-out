@@ -37,16 +37,16 @@ func Test_EnergyNorthWest_RealData(t *testing.T) {
 func Test_EnergyNorthWest_Status(t *testing.T) {
 	cases := []struct {
 		name      string
-		faultType string
+		faultType EnergyNorthWestOutageType
 		actualEnd string
 		want      Status
 	}{
-		{"current fault is active", "CurrentFault", "", StatusActive},
-		{"resolved fault is resolved", "ResolvedFault", "2026-06-25T12:00:00", StatusResolved},
-		{"todays planned works is planned", "TodaysPlannedWorks", "", StatusPlanned},
-		{"future planned works is planned", "FuturePlannedWorks", "", StatusPlanned},
-		{"unknown type with restoration is resolved", "CancelledPlanned", "2026-06-25T12:00:00", StatusResolved},
-		{"unknown type without restoration is active", "CancelledPlanned", "", StatusActive},
+		{"current fault is active", energyNorthWestCurrentFault, "", StatusActive},
+		{"resolved fault is resolved", energyNorthWestResolvedFault, "2026-06-25T12:00:00", StatusResolved},
+		{"todays planned works is planned", energyNorthWestTodaysPlannedWorks, "", StatusActive},
+		{"future planned works is planned", energyNorthWestFuturePlannedWorks, "", StatusPlanned},
+		{"unknown type with restoration is resolved", EnergyNorthWestOutageType("CancelledPlanned"), "2026-06-25T12:00:00", StatusResolved},
+		{"unknown type without restoration is active", EnergyNorthWestOutageType("CancelledPlanned"), "", StatusActive},
 	}
 
 	for _, tc := range cases {
