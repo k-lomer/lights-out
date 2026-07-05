@@ -36,8 +36,8 @@ func ListOutages(ctx context.Context, client DnoClient, outageCache *cache.Outag
 	client.UpdateLock()
 	defer client.UpdateUnlock()
 
-	// Another goroutine may have refreshed the cache while we waited on the
-	// lock, so re-check freshness before fetching again.
+	// Another call may have refreshed the cache while we waited on the
+	// lock, so re-check cache before fetching from the client.
 	lastUpdate := client.LastUpdate()
 	if lastUpdate != nil && time.Since(*lastUpdate) < outageCache.GetTtl() {
 		if outages, err := outageCache.Get(dno); err == nil {
