@@ -63,7 +63,15 @@ func (ngo NationalGridOutage) ToOutage() Outage {
 		Start:        toUTC(ngo.Start.Time),
 		EstimatedEnd: toUTC(ngo.End.Time),
 		Postcodes:    ngo.Postcodes,
+		Status:       ngo.status(),
 	}
+}
+
+func (ngo NationalGridOutage) status() Status {
+	if ngo.Start.Time != nil && ngo.Start.After(time.Now()) {
+		return StatusFuture
+	}
+	return StatusActive
 }
 
 func (ngo NationalGridOutages) ToOutages() []Outage {

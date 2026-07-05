@@ -33,6 +33,29 @@ func Test_NationalGrid_RealData(t *testing.T) {
 	assertConverted(t, got, DnoNationalGridDistribution, false)
 }
 
+// Test that a future start, a past start, or a missing start maps to the canonical status.
+func Test_NationalGrid_Status(t *testing.T) {
+	now := time.Now()
+	future := now.Add(24 * time.Hour)
+	past := now.Add(-24 * time.Hour)
+
+	cases := []struct {
+		name string
+		o    NationalGridOutage
+		want Status
+	}{
+		{"future start is future", NationalGridOutage{Start: OptionalNationalGridTime{Time: &future}}, StatusFuture},
+		{"past start is active", NationalGridOutage{Start: OptionalNationalGridTime{Time: &past}}, StatusActive},
+		{"missing start is active", NationalGridOutage{}, StatusActive},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.Equal(t, tc.want, tc.o.status())
+		})
+	}
+}
+
 // Test that real start and end times are parsed from the space-separated layout.
 func Test_NationalGrid_ParsesTimes(t *testing.T) {
 	var o NationalGridOutage
