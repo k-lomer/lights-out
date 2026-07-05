@@ -26,7 +26,7 @@ func Test_Sse_RealData(t *testing.T) {
 	// SSE always supplies both a logged and an estimated restoration time.
 	for _, o := range got {
 		assert.NotNil(t, o.Start)
-		assert.NotNil(t, o.End)
+		assert.NotNil(t, o.EstimatedEnd)
 	}
 }
 
@@ -56,7 +56,7 @@ func Test_Sse_ParsesTimes(t *testing.T) {
 
 	assert.Equal(t, "sse-1", got.ID)
 	assertTimeEqual(t, time.Date(2026, 6, 25, 11, 0, 0, 0, time.UTC), got.Start)
-	assertTimeEqual(t, time.Date(2026, 6, 25, 23, 0, 0, 0, time.UTC), got.End)
+	assertTimeEqual(t, time.Date(2026, 6, 25, 23, 0, 0, 0, time.UTC), got.EstimatedEnd)
 	assert.Equal(t, Postcodes{"HP13 7DZ", "HP13 7EA"}, got.Postcodes)
 }
 

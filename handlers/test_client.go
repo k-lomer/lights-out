@@ -37,12 +37,12 @@ func (t TestDnoClient) ListOutages(ctx context.Context) ([]model.Outage, error) 
 		p, _ := model.NewPostcode(fmt.Sprintf("N%d %dAA", i%100, i%10))
 		postcodes := []model.Postcode{p}
 		o := model.Outage{
-			DNO:         t.Dno,
-			ID:          strconv.Itoa(i),
-			Start:       &start,
-			End:         &end,
-			Postcodes:   postcodes,
-			LastUpdated: lastUpdated,
+			DNO:          t.Dno,
+			ID:           strconv.Itoa(i),
+			Start:        &start,
+			EstimatedEnd: &end,
+			Postcodes:    postcodes,
+			LastUpdated:  lastUpdated,
 		}
 		outages = append(outages, o)
 	}

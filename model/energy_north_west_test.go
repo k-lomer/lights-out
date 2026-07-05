@@ -33,8 +33,36 @@ func Test_EnergyNorthWest_RealData(t *testing.T) {
 	assertConverted(t, got, DnoEnergyNorthWest, true)
 }
 
-// Test that the actual restoration time is preferred over the estimated one.
-func Test_EnergyNorthWest_PrefersActualEnd(t *testing.T) {
+// Test that the fault type maps to the canonical status, with a timestamp fallback.
+func Test_EnergyNorthWest_Status(t *testing.T) {
+	cases := []struct {
+		name      string
+		faultType string
+		actualEnd string
+		want      Status
+	}{
+		{"current fault is active", "CurrentFault", "", StatusActive},
+		{"resolved fault is resolved", "ResolvedFault", "2026-06-25T12:00:00", StatusResolved},
+		{"todays planned works is planned", "TodaysPlannedWorks", "", StatusPlanned},
+		{"future planned works is planned", "FuturePlannedWorks", "", StatusPlanned},
+		{"unknown type with restoration is resolved", "CancelledPlanned", "2026-06-25T12:00:00", StatusResolved},
+		{"unknown type without restoration is active", "CancelledPlanned", "", StatusActive},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			o := EnergyNorthWestOutage{ID: "ENW-status", Type: tc.faultType}
+			if tc.actualEnd != "" {
+				o.ActualEnd = &EnergyNorthWestTime{Time: enwTime(t, tc.actualEnd)}
+			}
+
+			assert.Equal(t, tc.want, o.ToOutage().Status)
+		})
+	}
+}
+
+// Test that the estimated and actual restoration times are populated independently.
+func Test_EnergyNorthWest_SplitsEndTimes(t *testing.T) {
 	var o EnergyNorthWestOutage
 	require.NoError(t, json.Unmarshal([]byte(`{
 		"faultNumber": "ENW-1",
@@ -48,7 +76,8 @@ func Test_EnergyNorthWest_PrefersActualEnd(t *testing.T) {
 
 	assert.Equal(t, "ENW-1", got.ID)
 	assertTimeEqual(t, enwTime(t, "2026-06-25T10:00:00"), got.Start)
-	assertTimeEqual(t, enwTime(t, "2026-06-25T12:00:00"), got.End)
+	assertTimeEqual(t, enwTime(t, "2026-06-25T14:00:00"), got.EstimatedEnd)
+	assertTimeEqual(t, enwTime(t, "2026-06-25T12:00:00"), got.ActualEnd)
 	assert.Equal(t, Postcodes{"AB1 2CD", "EF3 4GH"}, got.Postcodes)
 }
 
@@ -64,10 +93,11 @@ func Test_EnergyNorthWest_FallsBackToEstimatedEnd(t *testing.T) {
 
 	got := o.ToOutage()
 
-	assertTimeEqual(t, enwTime(t, "2026-06-25T14:00:00"), got.End)
+	assertTimeEqual(t, enwTime(t, "2026-06-25T14:00:00"), got.EstimatedEnd)
+	assert.Nil(t, got.ActualEnd)
 }
 
-// Test that a missing actual and estimated end leaves End nil.
+// Test that a missing actual and estimated end leaves both end times nil.
 func Test_EnergyNorthWest_NoEnd(t *testing.T) {
 	var o EnergyNorthWestOutage
 	require.NoError(t, json.Unmarshal([]byte(`{
@@ -78,7 +108,8 @@ func Test_EnergyNorthWest_NoEnd(t *testing.T) {
 
 	got := o.ToOutage()
 
-	assert.Nil(t, got.End)
+	assert.Nil(t, got.EstimatedEnd)
+	assert.Nil(t, got.ActualEnd)
 }
 
 // Test that an empty affected postcodes string yields no postcodes.

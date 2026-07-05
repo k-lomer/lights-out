@@ -74,19 +74,23 @@ func (speo SPEnergyOutage) ToOutage() Outage {
 		start = &speo.Start.Time
 	}
 
-	var end *time.Time
+	var estimatedEnd *time.Time
+	if speo.EstimatedEnd != nil {
+		estimatedEnd = &speo.EstimatedEnd.Time
+	}
+
+	var actualEnd *time.Time
 	if speo.ActualEnd != nil {
-		end = &speo.ActualEnd.Time
-	} else if speo.EstimatedEnd != nil {
-		end = &speo.EstimatedEnd.Time
+		actualEnd = &speo.ActualEnd.Time
 	}
 
 	return Outage{
-		DNO:       DnoSPEnergy,
-		ID:        speo.ID,
-		Start:     toUTC(start),
-		End:       toUTC(end),
-		Postcodes: speo.Postcodes,
+		DNO:          DnoSPEnergy,
+		ID:           speo.ID,
+		Start:        toUTC(start),
+		EstimatedEnd: toUTC(estimatedEnd),
+		ActualEnd:    toUTC(actualEnd),
+		Postcodes:    speo.Postcodes,
 	}
 }
 

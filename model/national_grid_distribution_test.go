@@ -47,7 +47,7 @@ func Test_NationalGrid_ParsesTimes(t *testing.T) {
 
 	assert.Equal(t, "NG-1", got.ID)
 	assertTimeEqual(t, nationalGridTime(t, "2026-06-25 08:00:00"), got.Start)
-	assertTimeEqual(t, nationalGridTime(t, "2026-06-25 16:00:00"), got.End)
+	assertTimeEqual(t, nationalGridTime(t, "2026-06-25 16:00:00"), got.EstimatedEnd)
 	assert.Equal(t, Postcodes{"B24 9FF"}, got.Postcodes)
 }
 
@@ -64,7 +64,7 @@ func Test_NationalGrid_SentinelEnd(t *testing.T) {
 	got := o.ToOutage()
 
 	assertTimeEqual(t, nationalGridTime(t, "2026-06-25 08:00:00"), got.Start)
-	assert.Nil(t, got.End)
+	assert.Nil(t, got.EstimatedEnd)
 }
 
 // Test that the 1900-01-01 sentinel in either time field maps both to nil.
@@ -80,5 +80,5 @@ func Test_NationalGrid_BothSentinel(t *testing.T) {
 	got := o.ToOutage()
 
 	assert.Nil(t, got.Start)
-	assert.Nil(t, got.End)
+	assert.Nil(t, got.EstimatedEnd)
 }

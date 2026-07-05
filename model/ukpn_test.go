@@ -45,8 +45,8 @@ func Test_UKPowerNetwork_SkipsUndecodableOutage(t *testing.T) {
 	assert.Equal(t, "UKPN-good", outages[0].ID)
 }
 
-// Test that the restored time (millisecond layout) is preferred for the end time.
-func Test_UKPowerNetwork_PrefersRestored(t *testing.T) {
+// Test that the restored (millisecond layout) and estimated times populate the end fields independently.
+func Test_UKPowerNetwork_SplitsEndTimes(t *testing.T) {
 	var o UKPowerNetworkOutage
 	require.NoError(t, json.Unmarshal([]byte(`{
 		"IncidentReference": "UKPN-1",
@@ -60,7 +60,8 @@ func Test_UKPowerNetwork_PrefersRestored(t *testing.T) {
 
 	assert.Equal(t, "UKPN-1", got.ID)
 	assertTimeEqual(t, ukpnExpectedTime(t, ukpnTimeLayout, "2026-06-25T16:36:34"), got.Start)
-	assertTimeEqual(t, ukpnExpectedTime(t, ukpnTimeLayoutMs, "2026-06-25T18:18:56.06"), got.End)
+	assertTimeEqual(t, ukpnExpectedTime(t, ukpnTimeLayoutMs, "2026-06-25T18:18:56.06"), got.ActualEnd)
+	assertTimeEqual(t, ukpnExpectedTime(t, ukpnTimeLayout, "2026-06-25T20:30:00"), got.EstimatedEnd)
 	// Postcodes arrive without spaces and are normalised during conversion.
 	assert.Equal(t, Postcodes{"N16 6RJ", "E5 9AR"}, got.Postcodes)
 }
@@ -77,10 +78,11 @@ func Test_UKPowerNetwork_FallsBackToEstimated(t *testing.T) {
 
 	got := o.ToOutage()
 
-	assertTimeEqual(t, ukpnExpectedTime(t, ukpnTimeLayout, "2026-06-25T20:30:00"), got.End)
+	assertTimeEqual(t, ukpnExpectedTime(t, ukpnTimeLayout, "2026-06-25T20:30:00"), got.EstimatedEnd)
+	assert.Nil(t, got.ActualEnd)
 }
 
-// Test that a missing restored and estimated time leaves End nil.
+// Test that a missing restored and estimated time leaves both end times nil.
 func Test_UKPowerNetwork_NoEnd(t *testing.T) {
 	var o UKPowerNetworkOutage
 	require.NoError(t, json.Unmarshal([]byte(`{
@@ -91,7 +93,8 @@ func Test_UKPowerNetwork_NoEnd(t *testing.T) {
 
 	got := o.ToOutage()
 
-	assert.Nil(t, got.End)
+	assert.Nil(t, got.EstimatedEnd)
+	assert.Nil(t, got.ActualEnd)
 }
 
 // Test that invalid postcodes in the full postcode data are silently skipped.

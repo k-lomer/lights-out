@@ -62,20 +62,24 @@ func (ukpno UKPowerNetworkOutage) ToOutage() Outage {
 		startTime = &ukpno.Start.Time
 	}
 
-	var endTime *time.Time
+	var estimatedEnd *time.Time
+	if ukpno.Estimated != nil {
+		estimatedEnd = &ukpno.Estimated.Time
+	}
+
+	var actualEnd *time.Time
 	if ukpno.Restored != nil {
-		endTime = &ukpno.Restored.Time
-	} else if ukpno.Estimated != nil {
-		endTime = &ukpno.Estimated.Time
+		actualEnd = &ukpno.Restored.Time
 	}
 	postcodes, _ := ParsePostcodes(ukpno.Postcodes, false)
 
 	return Outage{
-		DNO:       DnoUKPowerNetwork,
-		ID:        ukpno.ID,
-		Start:     toUTC(startTime),
-		End:       toUTC(endTime),
-		Postcodes: postcodes,
+		DNO:          DnoUKPowerNetwork,
+		ID:           ukpno.ID,
+		Start:        toUTC(startTime),
+		EstimatedEnd: toUTC(estimatedEnd),
+		ActualEnd:    toUTC(actualEnd),
+		Postcodes:    postcodes,
 	}
 }
 

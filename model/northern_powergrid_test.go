@@ -69,7 +69,7 @@ func Test_NorthernPowergrid_SingleOutage(t *testing.T) {
 
 	assert.Equal(t, "NPG-1", got.ID)
 	assertTimeEqual(t, time.Date(2026, 6, 25, 13, 0, 0, 0, time.UTC), got.Start)
-	assertTimeEqual(t, time.Date(2026, 6, 25, 18, 0, 0, 0, time.UTC), got.End)
+	assertTimeEqual(t, time.Date(2026, 6, 25, 18, 0, 0, 0, time.UTC), got.EstimatedEnd)
 	assert.Equal(t, Postcodes{"NE34 0JA"}, got.Postcodes)
 }
 
@@ -85,7 +85,7 @@ func Test_NorthernPowergrid_SentinelEnd(t *testing.T) {
 
 	got := o.ToOutage()
 
-	assert.Nil(t, got.End)
+	assert.Nil(t, got.EstimatedEnd)
 }
 
 // Test that rows sharing reference, start and end merge into one outage with all postcodes.

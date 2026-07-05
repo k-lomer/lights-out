@@ -54,11 +54,11 @@ type NorthernPowergridOutage struct {
 
 func (npo NorthernPowergridOutage) ToOutage() Outage {
 	return Outage{
-		DNO:       DnoNorthernPowergrid,
-		ID:        npo.ID,
-		Start:     toUTC(npo.Start),
-		End:       toUTC(npo.End.Time),
-		Postcodes: []Postcode{npo.Postcode},
+		DNO:          DnoNorthernPowergrid,
+		ID:           npo.ID,
+		Start:        toUTC(npo.Start),
+		EstimatedEnd: toUTC(npo.End.Time),
+		Postcodes:    []Postcode{npo.Postcode},
 	}
 }
 

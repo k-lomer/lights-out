@@ -58,11 +58,11 @@ type NationalGridOutage struct {
 
 func (ngo NationalGridOutage) ToOutage() Outage {
 	return Outage{
-		DNO:       DnoNationalGridDistribution,
-		ID:        ngo.ID,
-		Start:     toUTC(ngo.Start.Time),
-		End:       toUTC(ngo.End.Time),
-		Postcodes: ngo.Postcodes,
+		DNO:          DnoNationalGridDistribution,
+		ID:           ngo.ID,
+		Start:        toUTC(ngo.Start.Time),
+		EstimatedEnd: toUTC(ngo.End.Time),
+		Postcodes:    ngo.Postcodes,
 	}
 }
 

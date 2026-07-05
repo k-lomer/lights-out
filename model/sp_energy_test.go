@@ -31,9 +31,9 @@ func Test_SPEnergy_RealData(t *testing.T) {
 	require.NotEmpty(t, got)
 	assert.Len(t, got, len(outages.Outages))
 	assertConverted(t, got, DnoSPEnergy, true)
-	// SP Energy always supplies an estimated end, so every outage has an end time.
+	// SP Energy supplies an estimated fix, an actual restoration, or both, so every outage has an end time.
 	for _, o := range got {
-		assert.NotNil(t, o.End)
+		assert.True(t, o.EstimatedEnd != nil || o.ActualEnd != nil)
 	}
 }
 
@@ -52,7 +52,7 @@ func Test_SPEnergy_PrimaryLayouts(t *testing.T) {
 
 	assert.Equal(t, "SP-1", got.ID)
 	assertTimeEqual(t, spTime(t, sPEnergyStartTimeLayout1, "2026-06-25 20:44:45"), got.Start)
-	assertTimeEqual(t, spTime(t, sPEnergyEndTimeLayout1, "6/25/2026, 8:53 PM"), got.End)
+	assertTimeEqual(t, spTime(t, sPEnergyEndTimeLayout1, "6/25/2026, 8:53 PM"), got.ActualEnd)
 	assert.Equal(t, Postcodes{"WA16 9LP", "CW10 9LN"}, got.Postcodes)
 }
 
@@ -83,11 +83,11 @@ func Test_SPEnergy_EndFallbackLayout(t *testing.T) {
 
 	got := o.ToOutage()
 
-	assertTimeEqual(t, spTime(t, sPEnergyEndTimeLayout2, "25/6/2026, 22:30"), got.End)
+	assertTimeEqual(t, spTime(t, sPEnergyEndTimeLayout2, "25/6/2026, 22:30"), got.EstimatedEnd)
 }
 
-// Test that the actual restoration time is preferred over the estimated fix.
-func Test_SPEnergy_PrefersActualEnd(t *testing.T) {
+// Test that the estimated fix and actual restoration times are populated independently.
+func Test_SPEnergy_SplitsEndTimes(t *testing.T) {
 	var o SPEnergyOutage
 	require.NoError(t, json.Unmarshal([]byte(`{
 		"incidentReference": "SP-4",
@@ -99,7 +99,8 @@ func Test_SPEnergy_PrefersActualEnd(t *testing.T) {
 
 	got := o.ToOutage()
 
-	assertTimeEqual(t, spTime(t, sPEnergyEndTimeLayout1, "6/25/2026, 8:53 PM"), got.End)
+	assertTimeEqual(t, spTime(t, sPEnergyEndTimeLayout1, "6/26/2026, 4:00 AM"), got.EstimatedEnd)
+	assertTimeEqual(t, spTime(t, sPEnergyEndTimeLayout1, "6/25/2026, 8:53 PM"), got.ActualEnd)
 }
 
 // Test that the estimated fix is used when no actual restoration time is present.
@@ -114,5 +115,5 @@ func Test_SPEnergy_FallsBackToEstimatedEnd(t *testing.T) {
 
 	got := o.ToOutage()
 
-	assertTimeEqual(t, spTime(t, sPEnergyEndTimeLayout1, "6/26/2026, 4:00 AM"), got.End)
+	assertTimeEqual(t, spTime(t, sPEnergyEndTimeLayout1, "6/26/2026, 4:00 AM"), got.EstimatedEnd)
 }

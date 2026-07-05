@@ -21,8 +21,11 @@ func assertConverted(t *testing.T, outages []Outage, dno Dno, startRequired bool
 		if o.Start != nil {
 			assert.Equal(t, time.UTC, o.Start.Location())
 		}
-		if o.End != nil {
-			assert.Equal(t, time.UTC, o.End.Location())
+		if o.EstimatedEnd != nil {
+			assert.Equal(t, time.UTC, o.EstimatedEnd.Location())
+		}
+		if o.ActualEnd != nil {
+			assert.Equal(t, time.UTC, o.ActualEnd.Location())
 		}
 		for _, p := range o.Postcodes {
 			assert.Regexp(t, isPostcode, string(p))
