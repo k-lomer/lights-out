@@ -66,7 +66,7 @@ Network Operators) and serves it from one endpoint, `GET /list`. See
   test cannot meaningfully continue after the failure (e.g. checking `NoError`
   before using the returned value, or asserting status before decoding a body).
 - **Test functions are named `Test_<Subject>_<Case>`** with underscores
-  (e.g. `Test_ListHandler_PageSize`, `Test_KvStore_GetExpired`). Each test has a
+  (e.g. `Test_ListHandler_PageSize`, `Test_OutageCache_GetExpired`). Each test has a
   one-line doc comment describing what it asserts.
 - **Commit messages are capitalised, imperative, and have no trailing full
   stop** (e.g. `Handle panics in DNO clients`, `Standardise DNO model names`).
@@ -78,13 +78,14 @@ Network Operators) and serves it from one endpoint, `GET /list`. See
 
 - **Adding a DNO** touches exactly: a new `clients/<dno>.go` implementing
   `DnoClient`; a new `model/<dno>.go` with the payload struct and `ToOutages`;
-  and registration in both `NewDnoClients()` ([cmd/main.go](cmd/main.go)) and
-  `model.AllDnoList` ([model/dno.go](model/dno.go)). The query-param flag for
+  and registration in both the `dnoClients` map in `main()`
+  ([cmd/main.go](cmd/main.go)) and `model.AllDnoList`
+  ([model/dno.go](model/dno.go)). The query-param flag for
   the DNO is derived automatically from `AllDnoList` — its name is the
   `model.Dno` string value (e.g. `UKPowerNetwork`).
 
 - **Constructors use `Make*`** (e.g. `MakeUKPowerNetworkClient`,
-  `MakeKvStore`), except the handler which uses `NewListHandler`. Match the
+  `MakeOutageCache`), except the handler which uses `NewListHandler`. Match the
   surrounding file.
 
 - **DNO targeting is opt-out**: in `ParseQueryParams`, a DNO flag that is absent
@@ -104,8 +105,12 @@ Network Operators) and serves it from one endpoint, `GET /list`. See
 - **Clients must drain and close response bodies** via the shared
   `drainAndClose` helper so connections are reused.
 
-- **`cache.KvStore` is not wired into the request path** yet — it's a
-  thread-safe TTL store available for future caching, not active behaviour.
+- **`cache.OutageCache` sits in front of every DNO client** in the request
+  path, keyed by DNO name with a shared TTL (10 minutes, set in `main()`). The
+  package-level `clients.ListOutages` helper does the cache check, per-client
+  update lock, and double-checked refresh; a nil cache bypasses caching and
+  calls the client directly. See [ARCHITECTURE.md](ARCHITECTURE.md) for the
+  flow.
 
 - **Tests** live beside the code (`*_test.go`), use `testify`, handler tests rely on
   stubbed HTTP responses / test client maps (see

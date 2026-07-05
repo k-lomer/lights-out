@@ -100,12 +100,20 @@ A JSON array of outages:
     "id": "INC-12345",
     "start_time": "2026-06-25T09:00:00+01:00",
     "end_time": "2026-06-25T13:30:00+01:00",
-    "postcodes": ["AB12 3CD", "AB12 3CE"]
+    "postcodes": ["AB12 3CD", "AB12 3CE"],
+    "last_updated_time": "2026-06-25T08:55:00Z"
   }
 ]
 ```
 
 `start_time` and `end_time` may be `null` when a DNO does not report a time.
+`last_updated_time` is when `lights-out` last fetched the outage from its DNO.
+
+### Caching
+
+Each DNO's outages are cached in memory for 10 minutes. A request that arrives
+while a DNO's entry is still fresh is served from the cache instead of
+re-querying the provider, so results may be up to that TTL stale.
 
 ### Status codes
 
@@ -136,7 +144,7 @@ cmd/       process entry point and dependency wiring
 handlers/  HTTP handler that fans out to DNO clients and assembles the response
 clients/   one HTTP client adapter per DNO (implements the DnoClient interface)
 model/     canonical Outage type, request parsing, and per-DNO payload models
-cache/     in-memory TTL key/value store
+cache/     in-memory per-DNO outage cache with a TTL
 ```
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for how these fit together and the
