@@ -97,6 +97,77 @@ func Test_UKPowerNetwork_NoEnd(t *testing.T) {
 	assert.Nil(t, got.ActualEnd)
 }
 
+// Test that the start comes from the received or planned date for planned work and the creation date otherwise.
+func Test_UKPowerNetwork_StartTime(t *testing.T) {
+	cases := []struct {
+		name string
+		json string
+		want string // Expected start in the UKPN layout; empty means nil.
+	}{
+		{
+			"planned work in progress uses the received date, not the weeks-early creation date",
+			`{"IncidentReference":"UKPN-1","CreationDateTime":"2026-06-11T12:40:26","ReceivedDate":"2026-07-05T09:01:00","PlannedDate":"2026-07-05T09:00:00","FullPostcodeData":["N166RJ"]}`,
+			"2026-07-05T09:01:00",
+		},
+		{
+			"planned work not yet begun has no received date and falls back to the planned date",
+			`{"IncidentReference":"UKPN-2","CreationDateTime":"2026-06-11T12:40:26","PlannedDate":"2026-07-05T09:00:00","FullPostcodeData":["N166RJ"]}`,
+			"2026-07-05T09:00:00",
+		},
+		{
+			"unplanned work with a received date still uses the creation date",
+			`{"IncidentReference":"UKPN-3","CreationDateTime":"2026-07-05T18:28:46","ReceivedDate":"2026-07-05T18:28:42","FullPostcodeData":["N166RJ"]}`,
+			"2026-07-05T18:28:46",
+		},
+		{
+			"no times leaves the start nil",
+			`{"IncidentReference":"UKPN-4","FullPostcodeData":["N166RJ"]}`,
+			"",
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			var o UKPowerNetworkOutage
+			require.NoError(t, json.Unmarshal([]byte(tc.json), &o))
+
+			got := o.ToOutage().Start
+			if tc.want == "" {
+				assert.Nil(t, got)
+				return
+			}
+			assertTimeEqual(t, ukpnExpectedTime(t, ukpnTimeLayout, tc.want), got)
+		})
+	}
+}
+
+// Test that a restoration, a future start, or an ongoing outage maps to the canonical status.
+func Test_UKPowerNetwork_Status(t *testing.T) {
+	now := time.Now()
+	future := ukpnTime{Time: now.Add(24 * time.Hour)}
+	past := ukpnTime{Time: now.Add(-24 * time.Hour)}
+	restored := ukpnTimeMs{Time: now}
+
+	cases := []struct {
+		name string
+		o    UKPowerNetworkOutage
+		want Status
+	}{
+		{"restored is resolved", UKPowerNetworkOutage{Creation: &past, Restored: &restored}, StatusResolved},
+		{"restored planned work is resolved", UKPowerNetworkOutage{Planned: &past, Received: &past, Restored: &restored}, StatusResolved},
+		{"planned work not yet begun is future", UKPowerNetworkOutage{Planned: &future}, StatusFuture},
+		{"planned work in progress is active", UKPowerNetworkOutage{Planned: &past, Received: &past}, StatusActive},
+		{"unplanned ongoing work is active", UKPowerNetworkOutage{Creation: &past}, StatusActive},
+		{"no times is active", UKPowerNetworkOutage{}, StatusActive},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.Equal(t, tc.want, tc.o.status())
+		})
+	}
+}
+
 // Test that invalid postcodes in the full postcode data are silently skipped.
 func Test_UKPowerNetwork_SkipsInvalidPostcodes(t *testing.T) {
 	var o UKPowerNetworkOutage
