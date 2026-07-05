@@ -5,9 +5,14 @@ endpoint, used as fixtures for the model conversion tests (`model/*_test.go`,
 embedded via `//go:embed`). This document records how to regenerate them and the
 data-format quirks we found while doing so, for future reference.
 
-The fixtures are **trimmed** to a small, representative subset of outages (and, for
-the noisiest providers, slimmed to only the fields the model decodes). The commands
-below return the **full** live payloads.
+The fixtures keep the **full field set** of each real record — every field the
+provider returns, not just the ones the model currently decodes — so new fields can
+be built from real examples later. Each is trimmed to **no more than 10** outages
+chosen to cover the variety of states the provider distinguishes (planned, current,
+and resolved outages, plus each status-code value present). Fields we actually use
+(notably the postcode lists) are kept **in full**; only large *unused* arrays are
+slimmed (see "Regenerating fixtures"). The commands below return the full live
+payloads.
 
 ## Capture commands
 
@@ -31,13 +36,19 @@ curl -s --compressed -m 30 \
   "https://ssen-powertrack-api.opcld.com/gridiview/reporter/info/livefaults"
 ```
 
-### UK Power Networks — requires a browser User-Agent and `Accept: text/plain`
+### UK Power Networks — sits behind Akamai, needs a full browser header set
 ```sh
 curl -s --compressed -m 30 \
   -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:150.0) Gecko/20100101 Firefox/150.0" \
-  -H "Accept: text/plain" \
+  -H "Accept: application/json, text/plain, */*" \
+  -H "Accept-Language: en-GB,en;q=0.9" \
+  -H "Referer: https://www.ukpowernetworks.co.uk/power-cut/" \
+  -H "Sec-Fetch-Dest: empty" -H "Sec-Fetch-Mode: cors" -H "Sec-Fetch-Site: same-origin" \
   "https://www.ukpowernetworks.co.uk/api/power-cut/all-incidents-light"
 ```
+The Go client's `User-Agent` + `Accept: text/plain` spoof is enough from Go's HTTP
+transport, but a raw `curl` with only those headers gets a **403 Access Denied** from
+Akamai — hence the fuller header set above.
 
 ### Energy North West — POST, with paging query params
 ```sh
@@ -107,7 +118,11 @@ comment in `model/outage.go`.
 - **SSE** serves gzip and returns garbled bytes unless decompressed — use
   `curl --compressed` (Go's transport does this transparently).
 - **UK Power Networks** returns 403/empty without a browser-like `User-Agent` and
-  `Accept: text/plain`.
+  `Accept` header. Go's transport gets through with just those two, but Akamai blocks a
+  raw `curl` unless it also sends `Referer`/`Accept-Language`/`Sec-Fetch-*` (see the
+  capture command). Its payload also includes `Multiple`/type-0 summary rows that carry
+  the nested `UnplannedIncidents`/`RestoredIncidents`/`PlannedIncidents` arrays — the
+  only place those fields are populated.
 - **SP Energy** returns an **empty body** unless the request sets
   `Content-Type: application/json`, uses a **self-signed/incomplete cert chain**
   (`curl -k`; the client uses `InsecureSkipVerify`), and requires a **two-step**
@@ -146,8 +161,18 @@ comment in `model/outage.go`.
 
 ## Regenerating fixtures
 
-After capturing a full payload, trim it to a representative subset (keep variety:
-some with end times, some without, sentinels, and — for Northern Powergrid — a
-duplicate-`Reference` group so the merge path is exercised). For UKPN, SSE, SP Energy
-and Energy North West the per-record HTML/`Steps`/`message` blobs are large and
-unused by the model, so keep only the decoded fields. Then re-run `go test ./model/`.
+After capturing a full payload, trim it to **no more than 10** records while keeping
+each record's **full field set**. Choose the records to cover the variety the provider
+distinguishes — some with end times, some without, sentinels, planned vs current vs
+resolved, and every status-code value present (e.g. ENW `Type`/`WebTMSFaultType`/
+`faultStatus`, UKPN `IncidentType`/`IncidentTypeName`/`PowerCutType`/`StatusId`) — and
+for Northern Powergrid include a duplicate-`Reference` group so the merge path is
+exercised. Keep the **complete top-level envelope**, not just the decoded fields.
+
+Keep anything the model uses in full — in particular the postcode lists (ENW
+`AffectedPostcodes`, UKPN `FullPostcodeData`, SSE `affectedAreas`, etc.). Only slim
+large *unused* arrays, preserving their shape: UKPN `Steps`/`Logs`/`PostcodeGeometryData`
+trim to ~3 elements each; ENW `addressMpanList` to ~3. Fields that are null/empty across
+the whole snapshot can't be given real values — leave them null. If a `*_RealData*` test
+hardcodes an ID/postcode from the old fixture, repoint it at data in the new one. Then
+re-run `go test ./model/`.

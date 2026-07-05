@@ -35,12 +35,12 @@ func Test_NorthernPowergrid_RealDataMerge(t *testing.T) {
 
 	var merged *Outage
 	for i := range got {
-		if got[i].ID == "INCD-785239-A" {
+		if got[i].ID == "INCD-790173-A" {
 			merged = &got[i]
 		}
 	}
 	require.NotNil(t, merged)
-	assert.ElementsMatch(t, Postcodes{"NE34 0JA", "NE34 0HX", "NE34 0HU"}, merged.Postcodes)
+	assert.ElementsMatch(t, Postcodes{"HG4 3HJ", "HG4 3HZ", "HG4 3JU", "HG4 3HF", "HG4 3HN"}, merged.Postcodes)
 }
 
 // Test that an outage with an unparseable time is skipped, not the whole batch.
