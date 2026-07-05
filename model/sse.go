@@ -38,10 +38,12 @@ func (so *SseOutages) UnmarshalJSON(data []byte) error {
 }
 
 type SseOutage struct {
-	ID        string   `json:"UUID"`
-	Start     *SseTime `json:"loggedAt"`
-	End       *SseTime `json:"estimatedRestoration"`
-	Postcodes []string `json:"affectedAreas"`
+	ID           string   `json:"reference"`
+	Start        *SseTime `json:"loggedAt"`
+	EstimatedEnd *SseTime `json:"estimatedRestoration"`
+	Updated      *SseTime `json:"updated"`
+	Resolved     bool     `json:"resolved"`
+	Postcodes    []string `json:"affectedAreas"`
 }
 
 func (so SseOutage) ToOutage() Outage {
@@ -53,8 +55,8 @@ func (so SseOutage) ToOutage() Outage {
 	}
 
 	var end *time.Time
-	if so.End != nil {
-		end = &so.End.Time
+	if so.EstimatedEnd != nil {
+		end = &so.EstimatedEnd.Time
 	}
 
 	return Outage{
@@ -62,8 +64,29 @@ func (so SseOutage) ToOutage() Outage {
 		ID:           so.ID,
 		Start:        toUTC(start),
 		EstimatedEnd: toUTC(end),
+		ActualEnd:    toUTC(so.actualEndTime()),
 		Postcodes:    postcodes,
+		Status:       so.status(),
 	}
+}
+
+// actualEndTime reports the real restoration time. SSE has no dedicated restored
+// field, but a resolved fault's last update is when it was marked restored.
+func (so SseOutage) actualEndTime() *time.Time {
+	if so.Resolved && so.Updated != nil {
+		return &so.Updated.Time
+	}
+	return nil
+}
+
+func (so SseOutage) status() Status {
+	if so.actualEndTime() != nil {
+		return StatusResolved
+	}
+	if so.Start != nil && so.Start.After(time.Now()) {
+		return StatusFuture
+	}
+	return StatusActive
 }
 
 func (so SseOutages) ToOutages() []Outage {

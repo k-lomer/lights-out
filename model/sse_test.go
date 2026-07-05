@@ -34,8 +34,8 @@ func Test_Sse_RealData(t *testing.T) {
 func Test_Sse_SkipsUndecodableOutage(t *testing.T) {
 	var outages SseOutages
 	require.NoError(t, json.Unmarshal([]byte(`{"Faults": [
-		{"UUID": "sse-good", "loggedAt": "2026-06-25T11:00:00.000+0000", "estimatedRestoration": "2026-06-26T00:00:00.000+0000", "affectedAreas": ["HP13 7DZ"]},
-		{"UUID": "sse-bad", "loggedAt": "not a time", "estimatedRestoration": "2026-06-26T00:00:00.000+0000", "affectedAreas": ["HP13 7DZ"]}
+		{"reference": "sse-good", "loggedAt": "2026-06-25T11:00:00.000+0000", "estimatedRestoration": "2026-06-26T00:00:00.000+0000", "affectedAreas": ["HP13 7DZ"]},
+		{"reference": "sse-bad", "loggedAt": "not a time", "estimatedRestoration": "2026-06-26T00:00:00.000+0000", "affectedAreas": ["HP13 7DZ"]}
 	]}`), &outages))
 
 	require.Len(t, outages.Outages, 1)
@@ -46,7 +46,7 @@ func Test_Sse_SkipsUndecodableOutage(t *testing.T) {
 func Test_Sse_ParsesTimes(t *testing.T) {
 	var o SseOutage
 	require.NoError(t, json.Unmarshal([]byte(`{
-		"UUID": "sse-1",
+		"reference": "sse-1",
 		"loggedAt": "2026-06-25T11:00:00.000+0000",
 		"estimatedRestoration": "2026-06-26T00:00:00.000+0100",
 		"affectedAreas": ["HP13 7DZ", "HP13 7EA"]
@@ -58,6 +58,64 @@ func Test_Sse_ParsesTimes(t *testing.T) {
 	assertTimeEqual(t, time.Date(2026, 6, 25, 11, 0, 0, 0, time.UTC), got.Start)
 	assertTimeEqual(t, time.Date(2026, 6, 25, 23, 0, 0, 0, time.UTC), got.EstimatedEnd)
 	assert.Equal(t, Postcodes{"HP13 7DZ", "HP13 7EA"}, got.Postcodes)
+}
+
+// Test that a resolved fault maps the update time to the actual end while an unresolved one leaves it nil.
+func Test_Sse_ActualEndFromResolved(t *testing.T) {
+	var resolved SseOutage
+	require.NoError(t, json.Unmarshal([]byte(`{
+		"reference": "sse-done",
+		"loggedAt": "2026-06-25T11:00:00.000+0000",
+		"estimatedRestoration": "2026-06-26T00:00:00.000+0000",
+		"updated": "2026-06-25T23:30:00.000+0000",
+		"resolved": true,
+		"affectedAreas": ["HP13 7DZ"]
+	}`), &resolved))
+
+	got := resolved.ToOutage()
+
+	assertTimeEqual(t, time.Date(2026, 6, 26, 0, 0, 0, 0, time.UTC), got.EstimatedEnd)
+	assertTimeEqual(t, time.Date(2026, 6, 25, 23, 30, 0, 0, time.UTC), got.ActualEnd)
+
+	var ongoing SseOutage
+	require.NoError(t, json.Unmarshal([]byte(`{
+		"reference": "sse-ongoing",
+		"loggedAt": "2026-06-25T11:00:00.000+0000",
+		"estimatedRestoration": "2026-06-26T00:00:00.000+0000",
+		"updated": "2026-06-25T23:30:00.000+0000",
+		"resolved": false,
+		"affectedAreas": ["HP13 7DZ"]
+	}`), &ongoing))
+
+	got = ongoing.ToOutage()
+
+	assertTimeEqual(t, time.Date(2026, 6, 26, 0, 0, 0, 0, time.UTC), got.EstimatedEnd)
+	assert.Nil(t, got.ActualEnd)
+}
+
+// Test that a resolved fault, a future start, or an ongoing outage maps to the canonical status.
+func Test_Sse_Status(t *testing.T) {
+	now := time.Now()
+	future := &SseTime{Time: now.Add(24 * time.Hour)}
+	past := &SseTime{Time: now.Add(-24 * time.Hour)}
+	updated := &SseTime{Time: now}
+
+	cases := []struct {
+		name string
+		o    SseOutage
+		want Status
+	}{
+		{"resolved is resolved", SseOutage{Start: past, Updated: updated, Resolved: true}, StatusResolved},
+		{"future start is future", SseOutage{Start: future}, StatusFuture},
+		{"past start is active", SseOutage{Start: past}, StatusActive},
+		{"missing start is active", SseOutage{}, StatusActive},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.Equal(t, tc.want, tc.o.status())
+		})
+	}
 }
 
 // Test that invalid postcodes in the affected areas are silently skipped.
