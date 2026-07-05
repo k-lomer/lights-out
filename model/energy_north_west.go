@@ -95,7 +95,7 @@ func (enw EnergyNorthWestOutage) status(actualEnd *time.Time) Status {
 	case energyNorthWestResolvedFault:
 		return StatusResolved
 	case energyNorthWestFuturePlannedWorks:
-		return StatusPlanned
+		return StatusFuture
 	default:
 		if actualEnd != nil {
 			return StatusResolved

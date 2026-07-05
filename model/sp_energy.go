@@ -91,7 +91,18 @@ func (speo SPEnergyOutage) ToOutage() Outage {
 		EstimatedEnd: toUTC(estimatedEnd),
 		ActualEnd:    toUTC(actualEnd),
 		Postcodes:    speo.Postcodes,
+		Status:       speo.status(),
 	}
+}
+
+func (speo SPEnergyOutage) status() Status {
+	if speo.Start != nil && speo.Start.After(time.Now()) {
+		return StatusFuture
+	}
+	if speo.ActualEnd != nil {
+		return StatusResolved
+	}
+	return StatusActive
 }
 
 func (speo SPEnergyOutages) ToOutages() []Outage {

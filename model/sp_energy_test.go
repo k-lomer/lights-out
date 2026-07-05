@@ -37,6 +37,31 @@ func Test_SPEnergy_RealData(t *testing.T) {
 	}
 }
 
+// Test that a future creation date, an actual restoration, or neither maps to the canonical status.
+func Test_SPEnergy_Status(t *testing.T) {
+	now := time.Now()
+	future := SPEnergyStartTime{Time: now.Add(24 * time.Hour)}
+	past := SPEnergyStartTime{Time: now.Add(-24 * time.Hour)}
+	restored := SPEnergyEndTime{Time: now}
+
+	cases := []struct {
+		name string
+		o    SPEnergyOutage
+		want Status
+	}{
+		{"future creation date is future", SPEnergyOutage{Start: &future}, StatusFuture},
+		{"actual restoration is resolved", SPEnergyOutage{Start: &past, ActualEnd: &restored}, StatusResolved},
+		{"past creation with no restoration is active", SPEnergyOutage{Start: &past}, StatusActive},
+		{"missing start with no restoration is active", SPEnergyOutage{}, StatusActive},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.Equal(t, tc.want, tc.o.status())
+		})
+	}
+}
+
 // Test the ISO start layout and the 12-hour AM/PM end layout (the live formats).
 func Test_SPEnergy_PrimaryLayouts(t *testing.T) {
 	var o SPEnergyOutage

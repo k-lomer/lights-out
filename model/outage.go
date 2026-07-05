@@ -10,7 +10,7 @@ import (
 type Status string
 
 const (
-	StatusPlanned  Status = "Planned"
+	StatusFuture   Status = "Future"
 	StatusActive   Status = "Active"
 	StatusResolved Status = "Resolved"
 )

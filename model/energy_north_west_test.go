@@ -43,8 +43,8 @@ func Test_EnergyNorthWest_Status(t *testing.T) {
 	}{
 		{"current fault is active", energyNorthWestCurrentFault, "", StatusActive},
 		{"resolved fault is resolved", energyNorthWestResolvedFault, "2026-06-25T12:00:00", StatusResolved},
-		{"todays planned works is planned", energyNorthWestTodaysPlannedWorks, "", StatusActive},
-		{"future planned works is planned", energyNorthWestFuturePlannedWorks, "", StatusPlanned},
+		{"todays planned works is active", energyNorthWestTodaysPlannedWorks, "", StatusActive},
+		{"future planned works is future", energyNorthWestFuturePlannedWorks, "", StatusFuture},
 		{"unknown type with restoration is resolved", EnergyNorthWestOutageType("CancelledPlanned"), "2026-06-25T12:00:00", StatusResolved},
 		{"unknown type without restoration is active", EnergyNorthWestOutageType("CancelledPlanned"), "", StatusActive},
 	}
