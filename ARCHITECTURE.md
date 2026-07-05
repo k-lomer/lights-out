@@ -26,8 +26,8 @@ flowchart TD
 
 A request is parsed into `QueryParams`, the handler queries every targeted DNO
 concurrently, each client converts its provider-specific payload into the shared
-`model.Outage` type, and the handler aggregates, sorts, postcode-filters, and
-paginates the combined result before encoding it as JSON. A per-DNO
+`model.Outage` type, and the handler aggregates, sorts, filters by status and
+postcode, and paginates the combined result before encoding it as JSON. A per-DNO
 `OutageCache` sits in front of each client, so a fresh cache entry is returned
 without touching the provider.
 
@@ -62,9 +62,9 @@ service. `ListHandler.getOutages` implements the fan-out:
   targeted client fails. Otherwise successful DNOs are returned.
 
 After collection the handler: aggregates all results, sorts them by a stable
-key for deterministic output, optionally filters by the requested postcodes,
-and applies pagination (`pageSize` / `pageIndex`, where `pageSize=0` means
-"return everything").
+key for deterministic output, filters by the requested statuses and then
+(optionally) the requested postcodes, and applies pagination (`pageSize` /
+`pageIndex`, where `pageSize=0` means "return everything").
 
 ### `clients` — one adapter per DNO
 Every DNO is reached through the [DnoClient](clients/dno_client.go) interface:
@@ -106,7 +106,9 @@ This package holds three kinds of thing:
    `model.Dno` and the list of all DNOs live in [model/dno.go](model/dno.go).
 2. **Request parsing** — [model/query_params.go](model/query_params.go) turns
    raw `url.Values` into a validated `QueryParams`. DNO targeting is opt-out:
-   absent or `true` includes a DNO, `false` excludes it.
+   absent or `true` includes a DNO, `false` excludes it. Status targeting uses
+   the same flags but a different default — `Active` is on unless disabled,
+   while `Future` and `Resolved` are off unless explicitly enabled.
    [model/postcode.go](model/postcode.go) normalises and validates UK postcodes
    (uppercasing, stripping stray characters, fixing `O`→`0`, inserting the
    space, regex-validating).
@@ -161,11 +163,13 @@ calls the client directly.
 ## Request/response summary
 
 - **Endpoint:** `GET /list`
-- **Query params:** `pageSize`, `pageIndex`, `postcodes` (comma-separated), and
-  one boolean flag per DNO name (`EnergyNorthWest`, `NationalGridDistribution`,
-  `NorthernPowergrid`, `SPEnergy`, `SSE`, `UKPowerNetwork`).
+- **Query params:** `pageSize`, `pageIndex`, `postcodes` (comma-separated), one
+  boolean flag per DNO name (`EnergyNorthWest`, `NationalGridDistribution`,
+  `NorthernPowergrid`, `SPEnergy`, `SSE`, `UKPowerNetwork`), and one boolean flag
+  per outage status (`Active`, `Future`, `Resolved`).
 - **Response:** `application/json` array of `Outage` objects
-  (`dno`, `id`, `start_time`, `end_time`, `postcodes`, `last_updated_time`).
+  (`dno`, `id`, `start_time`, `estimated_end`, `actual_end`, `postcodes`,
+  `last_updated_time`, `status`).
 - **Status codes:** `400` for unparseable params, `500` only when all targeted
   DNOs fail, `200` otherwise.
 </content>

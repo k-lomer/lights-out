@@ -63,11 +63,19 @@ GET /list
 | `pageIndex`      | Zero-based page number.                                                      | `0`            |
 | `postcodes`      | Comma-separated UK postcodes to filter by. Omit to return all.              | none           |
 | *(DNO name)*     | One boolean flag per DNO to include/exclude it (see below).                 | all included   |
+| *(status name)*  | One boolean flag per outage status to include/exclude it (see below).       | `Active` only  |
 
 **DNO targeting is opt-out.** Each DNO has its own flag named exactly after it:
 `EnergyNorthWest`, `NationalGridDistribution`, `NorthernPowergrid`, `SPEnergy`,
 `SSE`, `UKPowerNetwork`. A flag that is absent or `true` includes that DNO;
 `false` excludes it. Any other value is a `400`.
+
+**Status filtering works the same way.** Every outage has a `status` of
+`Active`, `Future`, or `Resolved`, and there is one flag per status named
+exactly after it. `Active` is included by default (its flag absent or `true`);
+`Future` and `Resolved` are excluded unless their flag is `true`. Setting a flag
+to `false` excludes that status, and any other value is a `400`. At least one
+status must remain targeted, otherwise the request is a `400`.
 
 ### Examples
 
@@ -98,16 +106,20 @@ A JSON array of outages:
   {
     "dno": "UKPowerNetwork",
     "id": "INC-12345",
-    "start_time": "2026-06-25T09:00:00+01:00",
-    "end_time": "2026-06-25T13:30:00+01:00",
+    "start_time": "2026-06-25T08:00:00Z",
+    "estimated_end": "2026-06-25T12:30:00Z",
+    "actual_end": null,
     "postcodes": ["AB12 3CD", "AB12 3CE"],
-    "last_updated_time": "2026-06-25T08:55:00Z"
+    "last_updated_time": "2026-06-25T08:55:00Z",
+    "status": "Active"
   }
 ]
 ```
 
-`start_time` and `end_time` may be `null` when a DNO does not report a time.
-`last_updated_time` is when `lights-out` last fetched the outage from its DNO.
+`start_time`, `estimated_end`, and `actual_end` are always UTC and may be `null`
+when a DNO does not report that time. `last_updated_time` is when `lights-out`
+last fetched the outage from its DNO. `status` is one of `Active`, `Future`, or
+`Resolved`.
 
 ### Caching
 
@@ -120,7 +132,7 @@ re-querying the provider, so results may be up to that TTL stale.
 | Code  | Meaning                                                        |
 | ----- | ------------------------------------------------------------- |
 | `200` | Success (including when some — but not all — DNOs failed).     |
-| `400` | A query parameter could not be parsed.                        |
+| `400` | A query parameter was invalid, or no DNOs/statuses were targeted. |
 | `500` | Every targeted DNO failed.                                    |
 
 If one DNO is unavailable the request still succeeds with the results from the

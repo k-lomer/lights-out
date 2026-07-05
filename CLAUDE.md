@@ -48,7 +48,8 @@ Network Operators) and serves it from one endpoint, `GET /list`. See
 - **The request path** ([handlers/list_handler.go](handlers/list_handler.go)):
   parse `QueryParams` → fan out one goroutine per targeted DNO (`sync.WaitGroup`,
   results written to per-index slices, no shared mutable state) → aggregate →
-  **stable sort by `DNO_ID` key** → optional postcode filter → paginate.
+  **stable sort by `DNO_ID` key** → status filter → optional postcode filter →
+  paginate.
 
 - **Failure handling is deliberate:** each goroutine has a `recover()`, and a
   request returns `500` **only if every** targeted DNO fails. Any partial
@@ -89,7 +90,10 @@ Network Operators) and serves it from one endpoint, `GET /list`. See
   surrounding file.
 
 - **DNO targeting is opt-out**: in `ParseQueryParams`, a DNO flag that is absent
-  or `true` includes it, `false` excludes it, anything else is a `400`.
+  or `true` includes it, `false` excludes it, anything else is a `400`. **Status
+  targeting** uses the same flag semantics but a different default — `Active` is
+  on unless set `false`, whereas `Future` and `Resolved` are off unless set
+  `true`. It is a `400` if no DNOs *or* no statuses end up targeted.
 
 - **Provider-specific quirks already encoded** (don't "fix" them blindly):
   SP Energy uses a dedicated `InsecureSkipVerify` HTTP client (incomplete cert
