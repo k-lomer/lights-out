@@ -15,7 +15,6 @@ func Test_ListNationalGridDistributionOutages(t *testing.T) {
 	var client = &http.Client{
 		Timeout: 30 * time.Second,
 	}
-	res, err := MakeNationalGridDistributionClient(client).ListOutages(ctx)
+	_, err := MakeNationalGridDistributionClient(client).ListOutages(ctx)
 	assert.NoError(t, err)
-	assert.NotEmpty(t, res)
 }

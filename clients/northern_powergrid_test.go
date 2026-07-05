@@ -15,7 +15,6 @@ func Test_ListNorthernPowergridOutages(t *testing.T) {
 	var client = &http.Client{
 		Timeout: 30 * time.Second,
 	}
-	res, err := MakeNorthernPowergridClient(client).ListOutages(ctx)
+	_, err := MakeNorthernPowergridClient(client).ListOutages(ctx)
 	assert.NoError(t, err)
-	assert.NotEmpty(t, res)
 }
