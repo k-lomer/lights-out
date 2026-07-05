@@ -11,24 +11,24 @@ import (
 	"github.com/k-lomer/lights-out/model"
 )
 
-var client *http.Client = &http.Client{
-	Timeout: 10 * time.Second,
-}
+func main() {
+	client := &http.Client{
+		Timeout: 10 * time.Second,
+	}
 
-// There is a certificate issue for the SP Energy API.
-// x509: certificate signed by unknown authority
-// This can be checked with `openssl s_client -connect powercuts.spenergynetworks.co.uk:443 -showcerts`
-// Use InsecureSkipVerify = true to ignore the incomplete certificate chain (missing intermediate certificates).
-// This could be fixed by manually providing the missing certificates.
-var insecureClient *http.Client = &http.Client{
-	Timeout: 10 * time.Second,
-	Transport: &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	},
-}
+	// There is a certificate issue for the SP Energy API.
+	// x509: certificate signed by unknown authority
+	// This can be checked with `openssl s_client -connect powercuts.spenergynetworks.co.uk:443 -showcerts`
+	// Use InsecureSkipVerify = true to ignore the incomplete certificate chain (missing intermediate certificates).
+	// This could be fixed by manually providing the missing certificates.
+	insecureClient := &http.Client{
+		Timeout: 10 * time.Second,
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		},
+	}
 
-func NewDnoClients() map[model.Dno]clients.DnoClient {
-	return map[model.Dno]clients.DnoClient{
+	dnoClients := map[model.Dno]clients.DnoClient{
 		model.DnoEnergyNorthWest:          clients.MakeEnergyNorthWestClient(client),
 		model.DnoNationalGridDistribution: clients.MakeNationalGridDistributionClient(client),
 		model.DnoNorthernPowergrid:        clients.MakeNorthernPowergridClient(client),
@@ -36,11 +36,9 @@ func NewDnoClients() map[model.Dno]clients.DnoClient {
 		model.DnoSse:                      clients.MakeSseClient(client),
 		model.DnoUKPowerNetwork:           clients.MakeUKPowerNetworkClient(client),
 	}
-}
 
-func main() {
 	mux := http.NewServeMux()
-	lh := handlers.NewListHandler(NewDnoClients())
+	lh := handlers.NewListHandler(dnoClients)
 
 	mux.Handle("GET /list", lh)
 	s := http.Server{
