@@ -13,6 +13,7 @@ type QueryParams struct {
 	PageIndex uint
 	Postcodes Postcodes
 	Dnos      []Dno
+	Status    []Status
 }
 
 func MakeDefaultQueryParams() QueryParams {
@@ -21,6 +22,7 @@ func MakeDefaultQueryParams() QueryParams {
 		PageIndex: 0,
 		Postcodes: []Postcode{},
 		Dnos:      []Dno{},
+		Status:    []Status{},
 	}
 }
 
@@ -65,6 +67,14 @@ func ParseQueryParams(values url.Values) (QueryParams, error) {
 		return qp, errors.New("no DNOs targeted")
 	}
 
+	err := checkStatusTarget(values, &qp.Status)
+	if err != nil {
+		return qp, err
+	}
+	if len(qp.Status) == 0 {
+		return qp, errors.New("no Status targeted")
+	}
+
 	return qp, nil
 }
 
@@ -80,4 +90,33 @@ func checkDnoTarget(values url.Values, targetDnos *[]Dno, dnoToCheck Dno) error 
 	}
 
 	return fmt.Errorf("unexpected non-boolean value for DNO %s: %s", dnoToCheck, isTarget)
+}
+
+func checkStatusTarget(values url.Values, targetStatus *[]Status) error {
+	// Only Active is true by default.
+	targetActive := values.Get(string(StatusActive))
+	targetActiveLower := strings.ToLower(targetActive)
+	if targetActiveLower == "" || targetActiveLower == "true" {
+		*targetStatus = append(*targetStatus, StatusActive)
+	} else if targetActiveLower != "false" {
+		return fmt.Errorf("unexpected non-boolean value for status %s: %s", StatusActive, targetActive)
+	}
+
+	targetFuture := values.Get(string(StatusFuture))
+	targetFutureLower := strings.ToLower(targetFuture)
+	if targetFutureLower == "true" {
+		*targetStatus = append(*targetStatus, StatusFuture)
+	} else if targetFutureLower != "false" && targetFutureLower != "" {
+		return fmt.Errorf("unexpected non-boolean value for status %s: %s", StatusFuture, targetFuture)
+	}
+
+	targetResolved := values.Get(string(StatusResolved))
+	targetResolvedLower := strings.ToLower(targetResolved)
+	if targetResolvedLower == "true" {
+		*targetStatus = append(*targetStatus, StatusResolved)
+	} else if targetResolvedLower != "false" && targetResolvedLower != "" {
+		return fmt.Errorf("unexpected non-boolean value for status %s: %s", StatusResolved, targetResolved)
+	}
+
+	return nil
 }

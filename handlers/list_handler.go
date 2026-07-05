@@ -84,7 +84,7 @@ func (lh ListHandler) getOutages(ctx context.Context, qp model.QueryParams) ([]m
 	// Sort to ensure determinism.
 	slices.SortFunc(totalOutages, model.KeyComp)
 
-	// Filter by postcode.
+	totalOutages = model.FilterByStatus(totalOutages, qp.Status)
 	totalOutages = model.FilterByPostcodes(totalOutages, qp.Postcodes)
 
 	// Page size 0 means return all results.

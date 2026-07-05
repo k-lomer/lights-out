@@ -10,10 +10,16 @@ import (
 type Status string
 
 const (
-	StatusFuture   Status = "Future"
 	StatusActive   Status = "Active"
+	StatusFuture   Status = "Future"
 	StatusResolved Status = "Resolved"
 )
+
+var AllStatusList = [3]Status{
+	StatusActive,
+	StatusFuture,
+	StatusResolved,
+}
 
 // ukLocation is the assumed timezone for DNOs that report timestamps without a
 // timezone offset (Energy North West, National Grid, SP Energy, UK Power Network).
@@ -39,8 +45,6 @@ type Outage struct {
 	Status       Status     `json:"status"`
 }
 
-// toUTC normalises a time pointer to UTC, preserving nil. Every Outage time is
-// stored in UTC, so each ToOutage routes its start and end through this.
 func toUTC(t *time.Time) *time.Time {
 	if t == nil {
 		return nil
@@ -83,6 +87,21 @@ func FilterByPostcodes(outages []Outage, postcodes Postcodes) []Outage {
 		for _, o := range outages {
 			for _, p := range o.Postcodes {
 				if hash[p] {
+					if !yield(o) {
+						return
+					}
+					break
+				}
+			}
+		}
+	})
+}
+
+func FilterByStatus(outages []Outage, status []Status) []Outage {
+	return slices.Collect(func(yield func(Outage) bool) {
+		for _, o := range outages {
+			for _, s := range status {
+				if o.Status == s {
 					if !yield(o) {
 						return
 					}

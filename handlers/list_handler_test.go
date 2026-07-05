@@ -159,6 +159,135 @@ func Test_ListHandler_DnoSelection(t *testing.T) {
 	checkDnoOutages(t, outages, []model.Dno{model.DnoEnergyNorthWest, model.DnoNationalGridDistribution})
 }
 
+// Test the status filter defaults to only active outages.
+func Test_ListHandler_StatusDefault(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, "/list", nil)
+	addQueryParams(req, "pageSize", "0")
+	res := httptest.NewRecorder()
+
+	lh := NewListHandler(NewTestDnoClients(), cache.MakeOutageCache(time.Minute))
+	lh.ServeHTTP(res, req)
+
+	requireStatus(t, res.Code, http.StatusOK)
+	outages := decodeOutages(t, res.Body)
+	assert.NotEmpty(t, outages)
+	for _, o := range outages {
+		assert.Equal(t, model.StatusActive, o.Status)
+	}
+}
+
+// Test selecting future outages returns only future outages.
+func Test_ListHandler_StatusFuture(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, "/list", nil)
+	addQueryParams(req, "pageSize", "0")
+	addQueryParams(req, string(model.StatusActive), "false")
+	addQueryParams(req, string(model.StatusFuture), "true")
+	res := httptest.NewRecorder()
+
+	lh := NewListHandler(NewTestDnoClients(), cache.MakeOutageCache(time.Minute))
+	lh.ServeHTTP(res, req)
+
+	requireStatus(t, res.Code, http.StatusOK)
+	outages := decodeOutages(t, res.Body)
+	assert.NotEmpty(t, outages)
+	for _, o := range outages {
+		assert.Equal(t, model.StatusFuture, o.Status)
+	}
+}
+
+// Test selecting resolved outages returns only resolved outages.
+func Test_ListHandler_StatusResolved(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, "/list", nil)
+	addQueryParams(req, "pageSize", "0")
+	addQueryParams(req, string(model.StatusActive), "false")
+	addQueryParams(req, string(model.StatusResolved), "true")
+	res := httptest.NewRecorder()
+
+	lh := NewListHandler(NewTestDnoClients(), cache.MakeOutageCache(time.Minute))
+	lh.ServeHTTP(res, req)
+
+	requireStatus(t, res.Code, http.StatusOK)
+	outages := decodeOutages(t, res.Body)
+	assert.NotEmpty(t, outages)
+	for _, o := range outages {
+		assert.Equal(t, model.StatusResolved, o.Status)
+	}
+}
+
+// Test selecting all statuses returns outages of every status.
+func Test_ListHandler_StatusAll(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, "/list", nil)
+	addQueryParams(req, "pageSize", "0")
+	addQueryParams(req, string(model.StatusActive), "true")
+	addQueryParams(req, string(model.StatusFuture), "true")
+	addQueryParams(req, string(model.StatusResolved), "true")
+	res := httptest.NewRecorder()
+
+	lh := NewListHandler(NewTestDnoClients(), cache.MakeOutageCache(time.Minute))
+	lh.ServeHTTP(res, req)
+
+	requireStatus(t, res.Code, http.StatusOK)
+	outages := decodeOutages(t, res.Body)
+
+	seen := map[model.Status]bool{}
+	for _, o := range outages {
+		seen[o.Status] = true
+	}
+	assert.True(t, seen[model.StatusActive])
+	assert.True(t, seen[model.StatusFuture])
+	assert.True(t, seen[model.StatusResolved])
+}
+
+// Test selecting future and resolved returns only those statuses, not active.
+func Test_ListHandler_StatusFutureAndResolved(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, "/list", nil)
+	addQueryParams(req, "pageSize", "0")
+	addQueryParams(req, string(model.StatusActive), "false")
+	addQueryParams(req, string(model.StatusFuture), "true")
+	addQueryParams(req, string(model.StatusResolved), "true")
+	res := httptest.NewRecorder()
+
+	lh := NewListHandler(NewTestDnoClients(), cache.MakeOutageCache(time.Minute))
+	lh.ServeHTTP(res, req)
+
+	requireStatus(t, res.Code, http.StatusOK)
+	outages := decodeOutages(t, res.Body)
+
+	seen := map[model.Status]bool{}
+	for _, o := range outages {
+		assert.NotEqual(t, model.StatusActive, o.Status)
+		seen[o.Status] = true
+	}
+	assert.True(t, seen[model.StatusFuture])
+	assert.True(t, seen[model.StatusResolved])
+}
+
+// Test an invalid status value returns a bad request.
+func Test_ListHandler_StatusInvalid(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, "/list", nil)
+	addQueryParams(req, string(model.StatusActive), "maybe")
+	res := httptest.NewRecorder()
+
+	lh := NewListHandler(NewTestDnoClients(), cache.MakeOutageCache(time.Minute))
+	lh.ServeHTTP(res, req)
+
+	requireStatus(t, res.Code, http.StatusBadRequest)
+}
+
+// Test targeting no statuses returns a bad request.
+func Test_ListHandler_StatusNoneTargeted(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, "/list", nil)
+	addQueryParams(req, string(model.StatusActive), "false")
+	addQueryParams(req, string(model.StatusFuture), "false")
+	addQueryParams(req, string(model.StatusResolved), "false")
+	res := httptest.NewRecorder()
+
+	lh := NewListHandler(NewTestDnoClients(), cache.MakeOutageCache(time.Minute))
+	lh.ServeHTTP(res, req)
+
+	requireStatus(t, res.Code, http.StatusBadRequest)
+}
+
 func Test_ListHandler_Caching(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/list", nil)
 	res := httptest.NewRecorder()

@@ -43,6 +43,7 @@ func (t TestDnoClient) ListOutages(ctx context.Context) ([]model.Outage, error) 
 			EstimatedEnd: &end,
 			Postcodes:    postcodes,
 			LastUpdated:  lastUpdated,
+			Status:       model.AllStatusList[i%len(model.AllStatusList)],
 		}
 		outages = append(outages, o)
 	}
