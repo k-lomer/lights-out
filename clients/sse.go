@@ -51,5 +51,8 @@ func (client SseClient) ListOutages(ctx context.Context) ([]model.Outage, error)
 		return nil, err
 	}
 
-	return liveOutages.ToOutages(), nil
+	ret := liveOutages.ToOutages()
+	model.SetLastUpdated(ret, client.SetUpdated())
+
+	return ret, nil
 }

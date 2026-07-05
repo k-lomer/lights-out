@@ -45,7 +45,10 @@ func (client EnergyNorthWestClient) ListOutages(ctx context.Context) ([]model.Ou
 		}
 	}
 
-	return outages.ToOutages(), nil
+	ret := outages.ToOutages()
+	model.SetLastUpdated(ret, client.SetUpdated())
+
+	return ret, nil
 
 }
 

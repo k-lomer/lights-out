@@ -20,9 +20,10 @@ func (u *UpdateTracker) LastUpdate() *time.Time {
 
 // SetUpdated sets the time of the most recent update.
 // Callers read it while holding the update lock.
-func (u *UpdateTracker) SetUpdated() {
+func (u *UpdateTracker) SetUpdated() time.Time {
 	now := time.Now()
 	u.lastUpdate = &now
+	return now
 }
 
 func (u *UpdateTracker) UpdateLock() {

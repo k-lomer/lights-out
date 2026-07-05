@@ -30,17 +30,19 @@ func (t TestDnoClient) GetDno() model.Dno {
 
 func (t TestDnoClient) ListOutages(ctx context.Context) ([]model.Outage, error) {
 	outages := make([]model.Outage, 0, t.NumOutages)
+	lastUpdated := time.Now()
 	for i := range t.NumOutages {
-		start := time.Now()
+		start, _ := time.Parse(time.RFC3339, "2026-07-05T15:00:00Z")
 		end := start.Add(30 * time.Hour)
 		p, _ := model.NewPostcode(fmt.Sprintf("N%d %dAA", i%100, i%10))
 		postcodes := []model.Postcode{p}
 		o := model.Outage{
-			DNO:       t.Dno,
-			ID:        strconv.Itoa(i),
-			Start:     &start,
-			End:       &end,
-			Postcodes: postcodes,
+			DNO:         t.Dno,
+			ID:          strconv.Itoa(i),
+			Start:       &start,
+			End:         &end,
+			Postcodes:   postcodes,
+			LastUpdated: lastUpdated,
 		}
 		outages = append(outages, o)
 	}

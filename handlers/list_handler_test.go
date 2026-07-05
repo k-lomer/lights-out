@@ -4,7 +4,9 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
+	"github.com/k-lomer/lights-out/cache"
 	"github.com/k-lomer/lights-out/model"
 	"github.com/stretchr/testify/assert"
 )
@@ -14,7 +16,7 @@ func Test_ListHandler_Basic(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/list", nil)
 	res := httptest.NewRecorder()
 
-	lh := NewListHandler(NewTestDnoClients())
+	lh := NewListHandler(NewTestDnoClients(), cache.MakeOutageCache(time.Minute))
 	lh.ServeHTTP(res, req)
 
 	requireStatus(t, res.Code, http.StatusOK)
@@ -28,7 +30,7 @@ func Test_ListHandler_PageSize(t *testing.T) {
 	addQueryParams(req, "pageSize", "2")
 	res := httptest.NewRecorder()
 
-	lh := NewListHandler(NewTestDnoClients())
+	lh := NewListHandler(NewTestDnoClients(), cache.MakeOutageCache(time.Minute))
 	lh.ServeHTTP(res, req)
 
 	requireStatus(t, res.Code, http.StatusOK)
@@ -42,7 +44,7 @@ func Test_ListHandler_PageIndex(t *testing.T) {
 	addQueryParams(req, "pageIndex", "0")
 	res := httptest.NewRecorder()
 
-	lh := NewListHandler(NewTestDnoClients())
+	lh := NewListHandler(NewTestDnoClients(), cache.MakeOutageCache(time.Minute))
 	lh.ServeHTTP(res, req)
 
 	requireStatus(t, res.Code, http.StatusOK)
@@ -69,7 +71,7 @@ func Test_ListHandler_AllOutages(t *testing.T) {
 	addQueryParams(req, "pageSize", "0")
 	res := httptest.NewRecorder()
 
-	lh := NewListHandler(NewTestDnoClients())
+	lh := NewListHandler(NewTestDnoClients(), cache.MakeOutageCache(time.Minute))
 	lh.ServeHTTP(res, req)
 
 	requireStatus(t, res.Code, http.StatusOK)
@@ -84,7 +86,7 @@ func Test_ListHandler_Postcodes(t *testing.T) {
 	addQueryParams(req, "pageSize", "0")
 	res := httptest.NewRecorder()
 
-	lh := NewListHandler(NewTestDnoClients())
+	lh := NewListHandler(NewTestDnoClients(), cache.MakeOutageCache(time.Minute))
 	lh.ServeHTTP(res, req)
 
 	requireStatus(t, res.Code, http.StatusOK)
@@ -116,7 +118,7 @@ func Test_ListHandler_PostcodesNoMatches(t *testing.T) {
 	addQueryParams(req, "postcodes", "X00XX")
 	res := httptest.NewRecorder()
 
-	lh := NewListHandler(NewTestDnoClients())
+	lh := NewListHandler(NewTestDnoClients(), cache.MakeOutageCache(time.Minute))
 	lh.ServeHTTP(res, req)
 
 	requireStatus(t, res.Code, http.StatusOK)
@@ -131,7 +133,7 @@ func Test_ListHandler_PostcodesInvalid(t *testing.T) {
 	addQueryParams(req, "postcodes", "XYZ")
 	res := httptest.NewRecorder()
 
-	lh := NewListHandler(NewTestDnoClients())
+	lh := NewListHandler(NewTestDnoClients(), cache.MakeOutageCache(time.Minute))
 	lh.ServeHTTP(res, req)
 
 	requireStatus(t, res.Code, http.StatusBadRequest)
@@ -149,10 +151,48 @@ func Test_ListHandler_DnoSelection(t *testing.T) {
 	addQueryParams(req, string(model.DnoUKPowerNetwork), "false")
 	res := httptest.NewRecorder()
 
-	lh := NewListHandler(NewTestDnoClients())
+	lh := NewListHandler(NewTestDnoClients(), cache.MakeOutageCache(time.Minute))
 	lh.ServeHTTP(res, req)
 
 	requireStatus(t, res.Code, http.StatusOK)
 	outages := decodeOutages(t, res.Body)
 	checkDnoOutages(t, outages, []model.Dno{model.DnoEnergyNorthWest, model.DnoNationalGridDistribution})
+}
+
+func Test_ListHandler_Caching(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, "/list", nil)
+	res := httptest.NewRecorder()
+
+	lh := NewListHandler(NewTestDnoClients(), cache.MakeOutageCache(time.Minute))
+	lh.ServeHTTP(res, req)
+
+	requireStatus(t, res.Code, http.StatusOK)
+	outages1 := decodeOutages(t, res.Body)
+	assert.NotEmpty(t, outages1)
+
+	lh.ServeHTTP(res, req)
+	requireStatus(t, res.Code, http.StatusOK)
+	outages2 := decodeOutages(t, res.Body)
+	assert.NotEmpty(t, outages2)
+
+	assert.Equal(t, outages1, outages2)
+}
+
+func Test_ListHandler_NoCaching(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, "/list", nil)
+	res := httptest.NewRecorder()
+
+	lh := NewListHandler(NewTestDnoClients(), nil)
+	lh.ServeHTTP(res, req)
+
+	requireStatus(t, res.Code, http.StatusOK)
+	outages1 := decodeOutages(t, res.Body)
+	assert.NotEmpty(t, outages1)
+
+	lh.ServeHTTP(res, req)
+	requireStatus(t, res.Code, http.StatusOK)
+	outages2 := decodeOutages(t, res.Body)
+	assert.NotEmpty(t, outages2)
+
+	assert.NotEqual(t, outages1, outages2)
 }

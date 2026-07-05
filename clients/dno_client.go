@@ -21,12 +21,16 @@ type DnoClient interface {
 	ListOutages(ctx context.Context) ([]model.Outage, error)
 	GetDno() model.Dno
 	LastUpdate() *time.Time
-	SetUpdated()
+	SetUpdated() time.Time
 	UpdateLock()
 	UpdateUnlock()
 }
 
 func ListOutages(ctx context.Context, client DnoClient, outageCache *cache.OutageCache) ([]model.Outage, error) {
+	if outageCache == nil {
+		return client.ListOutages(ctx)
+	}
+
 	dno := string(client.GetDno())
 
 	if outages, err := outageCache.Get(dno); err == nil {
@@ -50,7 +54,6 @@ func ListOutages(ctx context.Context, client DnoClient, outageCache *cache.Outag
 		return nil, err
 	}
 
-	client.SetUpdated()
 	outageCache.Set(dno, outages)
 
 	return outages, nil

@@ -51,5 +51,8 @@ func (client NationalGridDistributionClient) ListOutages(ctx context.Context) ([
 		return nil, err
 	}
 
-	return outages.ToOutages(), nil
+	ret := outages.ToOutages()
+	model.SetLastUpdated(ret, client.SetUpdated())
+
+	return ret, nil
 }

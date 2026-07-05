@@ -21,11 +21,12 @@ var ukLocation, _ = time.LoadLocation("Europe/London")
 // some as UK local wall-clock, others as UTC — so each client's ToOutage
 // normalises them through toUTC, giving consumers one consistent timezone.
 type Outage struct {
-	DNO       Dno        `json:"dno"`
-	ID        string     `json:"id"`
-	Start     *time.Time `json:"start_time"`
-	End       *time.Time `json:"end_time"`
-	Postcodes Postcodes  `json:"postcodes"`
+	DNO         Dno        `json:"dno"`
+	ID          string     `json:"id"`
+	Start       *time.Time `json:"start_time"`
+	End         *time.Time `json:"end_time"`
+	Postcodes   Postcodes  `json:"postcodes"`
+	LastUpdated time.Time  `json:"last_updated_time"`
 }
 
 // toUTC normalises a time pointer to UTC, preserving nil. Every Outage time is
@@ -48,6 +49,12 @@ func AggregateOutages(outages [][]Outage) []Outage {
 		totalOutages = append(totalOutages, r...)
 	}
 	return totalOutages
+}
+
+func SetLastUpdated(outages []Outage, t time.Time) {
+	for i := range outages {
+		outages[i].LastUpdated = t
+	}
 }
 
 func KeyComp(o1, o2 Outage) int {

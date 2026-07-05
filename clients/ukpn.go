@@ -55,5 +55,8 @@ func (client UKPowerNetworkClient) ListOutages(ctx context.Context) ([]model.Out
 		return nil, err
 	}
 
-	return model.UKPowerNetworkToOutages(outages), nil
+	ret := model.UKPowerNetworkToOutages(outages)
+	model.SetLastUpdated(ret, client.SetUpdated())
+
+	return ret, nil
 }

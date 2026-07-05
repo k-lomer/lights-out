@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/k-lomer/lights-out/cache"
 	"github.com/k-lomer/lights-out/clients"
 	"github.com/k-lomer/lights-out/handlers"
 	"github.com/k-lomer/lights-out/model"
@@ -37,8 +38,10 @@ func main() {
 		model.DnoUKPowerNetwork:           clients.MakeUKPowerNetworkClient(client),
 	}
 
+	cache := cache.MakeOutageCache(10 * time.Minute)
+
 	mux := http.NewServeMux()
-	lh := handlers.NewListHandler(dnoClients)
+	lh := handlers.NewListHandler(dnoClients, cache)
 
 	mux.Handle("GET /list", lh)
 	s := http.Server{

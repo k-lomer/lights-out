@@ -11,17 +11,20 @@ import (
 	"sync"
 	"time"
 
+	"github.com/k-lomer/lights-out/cache"
 	"github.com/k-lomer/lights-out/clients"
 	"github.com/k-lomer/lights-out/model"
 )
 
 type ListHandler struct {
 	dnoClients map[model.Dno]clients.DnoClient
+	cache      *cache.OutageCache
 }
 
-func NewListHandler(dnoClients map[model.Dno]clients.DnoClient) ListHandler {
+func NewListHandler(dnoClients map[model.Dno]clients.DnoClient, cache *cache.OutageCache) ListHandler {
 	return ListHandler{
 		dnoClients,
+		cache,
 	}
 }
 
@@ -53,7 +56,7 @@ func (lh ListHandler) getOutages(ctx context.Context, qp model.QueryParams) ([]m
 				}
 			}()
 
-			outages, err := client.ListOutages(ctx)
+			outages, err := clients.ListOutages(ctx, client, lh.cache)
 			if err != nil {
 				log.Printf("error getting outages for %s: %v", client.GetDno(), err)
 				dnoErrs[i] = err

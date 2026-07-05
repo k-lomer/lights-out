@@ -97,6 +97,7 @@ func (client SPEnergyClient) ListOutages(ctx context.Context) ([]model.Outage, e
 		return nil, err
 	}
 	if count == 0 {
+		client.SetUpdated()
 		return []model.Outage{}, nil
 	}
 
@@ -107,5 +108,8 @@ func (client SPEnergyClient) ListOutages(ctx context.Context) ([]model.Outage, e
 		return nil, err
 	}
 
-	return outages.ToOutages(), nil
+	ret := outages.ToOutages()
+	model.SetLastUpdated(ret, client.SetUpdated())
+
+	return ret, nil
 }
