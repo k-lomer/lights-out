@@ -45,11 +45,15 @@ func (n *NorthernPowergridOutages) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+const northernPowergridCompletedMessage = "The scheduled work has now been completed"
+
 type NorthernPowergridOutage struct {
-	ID       string                        `json:"Reference"`
-	Start    *time.Time                    `json:"LoggedTime"`
-	End      OptionalNorthernPowergridTime `json:"EstimatedTimeTillResolution"`
-	Postcode Postcode                      `json:"Postcode"`
+	ID           string                        `json:"Reference"`
+	Start        *time.Time                    `json:"LoggedTime"`
+	EstimatedEnd OptionalNorthernPowergridTime `json:"EstimatedTimeTillResolution"`
+	Updated      *time.Time                    `json:"UpdateDate"`
+	Message      string                        `json:"CustomerStageSequenceMessage"`
+	Postcode     Postcode                      `json:"Postcode"`
 }
 
 func (npo NorthernPowergridOutage) ToOutage() Outage {
@@ -57,9 +61,31 @@ func (npo NorthernPowergridOutage) ToOutage() Outage {
 		DNO:          DnoNorthernPowergrid,
 		ID:           npo.ID,
 		Start:        toUTC(npo.Start),
-		EstimatedEnd: toUTC(npo.End.Time),
+		EstimatedEnd: toUTC(npo.EstimatedEnd.Time),
+		ActualEnd:    toUTC(npo.actualEndTime()),
 		Postcodes:    []Postcode{npo.Postcode},
+		Status:       npo.status(),
 	}
+}
+
+// actualEndTime reports the real restoration time. Northern Powergrid has no
+// dedicated restored field, but a completed stage message means the incident is
+// over, so its last update time is used as the actual end.
+func (npo NorthernPowergridOutage) actualEndTime() *time.Time {
+	if npo.Message == northernPowergridCompletedMessage {
+		return npo.Updated
+	}
+	return nil
+}
+
+func (npo NorthernPowergridOutage) status() Status {
+	if npo.actualEndTime() != nil {
+		return StatusResolved
+	}
+	if npo.Start != nil && npo.Start.After(time.Now()) {
+		return StatusFuture
+	}
+	return StatusActive
 }
 
 func (npo NorthernPowergridOutage) getKey() string {
@@ -67,7 +93,12 @@ func (npo NorthernPowergridOutage) getKey() string {
 	if npo.Start != nil {
 		start = npo.Start.String()
 	}
-	return npo.ID + start + npo.End.String()
+	actualEndTimeString := ""
+	actualEndTime := npo.actualEndTime()
+	if actualEndTime != nil {
+		actualEndTimeString = actualEndTime.String()
+	}
+	return npo.ID + start + npo.EstimatedEnd.String() + actualEndTimeString
 }
 
 func NorthernPowergridToOutages(npos NorthernPowergridOutages) []Outage {

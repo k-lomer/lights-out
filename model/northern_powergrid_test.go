@@ -88,6 +88,63 @@ func Test_NorthernPowergrid_SentinelEnd(t *testing.T) {
 	assert.Nil(t, got.EstimatedEnd)
 }
 
+// Test that a completed stage message maps the update time to the actual end while a non-completed row leaves it nil.
+func Test_NorthernPowergrid_ActualEndFromCompletedMessage(t *testing.T) {
+	var completed NorthernPowergridOutage
+	require.NoError(t, json.Unmarshal([]byte(`{
+		"Reference": "NPG-done",
+		"LoggedTime": "2026-06-25T13:00:00Z",
+		"EstimatedTimeTillResolution": "2026-06-25T18:00:00Z",
+		"UpdateDate": "2026-06-25T17:30:00Z",
+		"CustomerStageSequenceMessage": "The scheduled work has now been completed",
+		"Postcode": "NE34 0JA"
+	}`), &completed))
+
+	got := completed.ToOutage()
+
+	assertTimeEqual(t, time.Date(2026, 6, 25, 18, 0, 0, 0, time.UTC), got.EstimatedEnd)
+	assertTimeEqual(t, time.Date(2026, 6, 25, 17, 30, 0, 0, time.UTC), got.ActualEnd)
+
+	var ongoing NorthernPowergridOutage
+	require.NoError(t, json.Unmarshal([]byte(`{
+		"Reference": "NPG-ongoing",
+		"LoggedTime": "2026-06-25T13:00:00Z",
+		"EstimatedTimeTillResolution": "2026-06-25T18:00:00Z",
+		"UpdateDate": "2026-06-25T17:30:00Z",
+		"CustomerStageSequenceMessage": "Our team has arrived in the area affected by the power cut.",
+		"Postcode": "NE34 0JA"
+	}`), &ongoing))
+
+	got = ongoing.ToOutage()
+
+	assertTimeEqual(t, time.Date(2026, 6, 25, 18, 0, 0, 0, time.UTC), got.EstimatedEnd)
+	assert.Nil(t, got.ActualEnd)
+}
+
+// Test that a completion message, a future start, or an ongoing outage maps to the canonical status.
+func Test_NorthernPowergrid_Status(t *testing.T) {
+	now := time.Now()
+	future := now.Add(24 * time.Hour)
+	past := now.Add(-24 * time.Hour)
+
+	cases := []struct {
+		name string
+		o    NorthernPowergridOutage
+		want Status
+	}{
+		{"completed message is resolved", NorthernPowergridOutage{Start: &past, Updated: &now, Message: northernPowergridCompletedMessage}, StatusResolved},
+		{"future start is future", NorthernPowergridOutage{Start: &future}, StatusFuture},
+		{"past start is active", NorthernPowergridOutage{Start: &past}, StatusActive},
+		{"missing start is active", NorthernPowergridOutage{}, StatusActive},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.Equal(t, tc.want, tc.o.status())
+		})
+	}
+}
+
 // Test that rows sharing reference, start and end merge into one outage with all postcodes.
 func Test_NorthernPowergrid_MergesDuplicates(t *testing.T) {
 	var outages NorthernPowergridOutages
