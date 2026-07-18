@@ -15,6 +15,9 @@ func Test_ListSseOutages(t *testing.T) {
 	var client = &http.Client{
 		Timeout: 30 * time.Second,
 	}
-	_, err := MakeSseClient(client).ListOutages(ctx)
+	outages, err := MakeSseClient(client).ListOutages(ctx)
 	assert.NoError(t, err)
+	for _, o := range outages {
+		assert.NoError(t, o.Validate())
+	}
 }

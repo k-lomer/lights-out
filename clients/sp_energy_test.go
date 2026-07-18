@@ -48,6 +48,9 @@ func Test_ListSPEnergyOutages(t *testing.T) {
 		},
 	}
 
-	_, err := MakeSPEnergyClient(client).ListOutages(ctx)
+	outages, err := MakeSPEnergyClient(client).ListOutages(ctx)
 	assert.NoError(t, err)
+	for _, o := range outages {
+		assert.NoError(t, o.Validate())
+	}
 }
