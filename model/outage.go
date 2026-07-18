@@ -6,6 +6,9 @@ import (
 	"net/url"
 	"slices"
 	"time"
+
+	// Embed the timezone database so ukLocation always resolves.
+	_ "time/tzdata"
 )
 
 type Status string
