@@ -7,6 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 All common tasks go through the [Makefile](Makefile):
 
 ```sh
+make         # default target (all): fmt, vet, lint, test, build
 make run     # go run ./cmd  — serves on :8080
 make build   # build binary to bin/lights-out
 make test    # go clean -testcache && go test ./...
@@ -16,7 +17,8 @@ make lint    # golangci-lint run
 make all     # fmt, vet, lint, test, build
 ```
 
-`make test` always clears the test cache first. To run a single package or test
+**Validate changes with `make` (no args)** — the default target runs fmt, vet,
+lint, test, and build. `make test` always clears the test cache first. To run a single package or test
 directly, bypass the Makefile:
 
 ```sh
