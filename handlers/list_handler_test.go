@@ -315,6 +315,7 @@ func Test_ListHandler_Caching(t *testing.T) {
 	outages1 := decodeOutages(t, res.Body)
 	assert.NotEmpty(t, outages1)
 
+	res = httptest.NewRecorder()
 	lh.ServeHTTP(res, req)
 	requireStatus(t, res.Code, http.StatusOK)
 	outages2 := decodeOutages(t, res.Body)
@@ -334,6 +335,7 @@ func Test_ListHandler_NoCaching(t *testing.T) {
 	outages1 := decodeOutages(t, res.Body)
 	assert.NotEmpty(t, outages1)
 
+	res = httptest.NewRecorder()
 	lh.ServeHTTP(res, req)
 	requireStatus(t, res.Code, http.StatusOK)
 	outages2 := decodeOutages(t, res.Body)
