@@ -2,6 +2,7 @@ package model
 
 import (
 	"cmp"
+	"fmt"
 	"net/url"
 	"slices"
 	"time"
@@ -15,10 +16,14 @@ const (
 	StatusResolved Status = "Resolved"
 )
 
-var AllStatusList = [3]Status{
+var AllStatusList = []Status{
 	StatusActive,
 	StatusFuture,
 	StatusResolved,
+}
+
+func (s Status) isValid() bool {
+	return slices.Contains(AllStatusList, s)
 }
 
 // ukLocation is the assumed timezone for DNOs that report timestamps without a
@@ -55,6 +60,37 @@ func toUTC(t *time.Time) *time.Time {
 
 func (o Outage) GetKey() string {
 	return string(o.DNO) + "_" + url.QueryEscape(o.ID)
+}
+
+func (o Outage) Validate() error {
+	if !o.DNO.isValid() {
+		return fmt.Errorf("invalid outage: DNO %s, %#v", o.DNO, o)
+	}
+	if len(o.ID) == 0 {
+		return fmt.Errorf("invalid outage: ID missing, %#v", o)
+	}
+	if o.Start != nil && o.Start.Location() != time.UTC {
+		return fmt.Errorf("invalid outage: Start time location must be UTC, got %v, %#v", o.Start.Location(), o)
+	}
+	if o.EstimatedEnd != nil && o.EstimatedEnd.Location() != time.UTC {
+		return fmt.Errorf("invalid outage: EstimatedEnd time location must be UTC, got %v, %#v", o.EstimatedEnd.Location(), o)
+	}
+	if o.ActualEnd != nil && o.ActualEnd.Location() != time.UTC {
+		return fmt.Errorf("invalid outage: ActualEnd time location must be UTC, got %v, %#v", o.ActualEnd.Location(), o)
+	}
+	for _, p := range o.Postcodes {
+		if !p.isValid() {
+			return fmt.Errorf("invalid outage: Postcode %s, %#v", p, o)
+		}
+	}
+	if o.LastUpdated.Location() != time.UTC {
+		return fmt.Errorf("invalid outage: LastUpdated time location must be UTC, got %v, %#v", o.LastUpdated.Location(), o)
+	}
+	if !o.Status.isValid() {
+		return fmt.Errorf("invalid outage: Status %s, %#v", o.Status, o)
+	}
+
+	return nil
 }
 
 func AggregateOutages(outages [][]Outage) []Outage {
@@ -110,4 +146,21 @@ func FilterByStatus(outages []Outage, status []Status) []Outage {
 			}
 		}
 	})
+}
+
+func FilterValidOnly(outages []Outage) ([]Outage, []error) {
+	errors := make([]error, 0)
+	valid_outages := slices.Collect(func(yield func(Outage) bool) {
+		for _, o := range outages {
+			err := o.Validate()
+			if err == nil {
+				if !yield(o) {
+					return
+				}
+			} else {
+				errors = append(errors, err)
+			}
+		}
+	})
+	return valid_outages, errors
 }

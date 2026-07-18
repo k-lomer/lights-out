@@ -11,6 +11,10 @@ var isPostcode = regexp.MustCompile(`^[A-Z]{1,2}\d[A-Z\d]?\s\d[A-Z]{2}$`)
 
 type Postcode string
 
+func (p Postcode) isValid() bool {
+	return isPostcode.MatchString(string(p))
+}
+
 func NewPostcode(s string) (Postcode, error) {
 	p := s
 
@@ -36,7 +40,8 @@ func NewPostcode(s string) (Postcode, error) {
 
 	inwardCodeIndex := len(p) - 3
 	p = p[:inwardCodeIndex] + " " + p[inwardCodeIndex:]
-	if !isPostcode.MatchString(p) {
+	postcode := Postcode(p)
+	if !postcode.isValid() {
 		return "", fmt.Errorf("invalid postcode format: '%s'", s)
 	}
 	return Postcode(p), nil

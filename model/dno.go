@@ -1,5 +1,7 @@
 package model
 
+import "slices"
+
 type Dno string
 
 const (
@@ -11,11 +13,15 @@ const (
 	DnoUKPowerNetwork           Dno = "UKPowerNetwork"
 )
 
-var AllDnoList = [6]Dno{
+var AllDnoList = []Dno{
 	DnoEnergyNorthWest,
 	DnoNationalGridDistribution,
 	DnoNorthernPowergrid,
 	DnoSPEnergy,
 	DnoSse,
 	DnoUKPowerNetwork,
+}
+
+func (dno Dno) isValid() bool {
+	return slices.Contains(AllDnoList, dno)
 }
