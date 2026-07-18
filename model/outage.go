@@ -150,7 +150,7 @@ func FilterByStatus(outages []Outage, status []Status) []Outage {
 
 func FilterValidOnly(outages []Outage) ([]Outage, []error) {
 	errors := make([]error, 0)
-	valid_outages := slices.Collect(func(yield func(Outage) bool) {
+	validOutages := slices.Collect(func(yield func(Outage) bool) {
 		for _, o := range outages {
 			err := o.Validate()
 			if err == nil {
@@ -162,5 +162,5 @@ func FilterValidOnly(outages []Outage) ([]Outage, []error) {
 			}
 		}
 	})
-	return valid_outages, errors
+	return validOutages, errors
 }
