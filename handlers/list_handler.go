@@ -86,6 +86,10 @@ func (lh ListHandler) getOutages(ctx context.Context, qp model.QueryParams) ([]m
 
 	totalOutages = model.FilterByStatus(totalOutages, qp.Status)
 	totalOutages = model.FilterByPostcodes(totalOutages, qp.Postcodes)
+	totalOutages, errs := model.FilterValidOnly(totalOutages)
+	for _, err := range errs {
+		log.Printf("invalid outage: %v", err)
+	}
 
 	// Page size 0 means return all results.
 	if qp.PageSize == 0 {
