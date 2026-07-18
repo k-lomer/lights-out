@@ -82,6 +82,60 @@ func Test_FilterByPostcodes_NoMatches(t *testing.T) {
 	assert.Empty(t, got)
 }
 
+func statusOutage(id string, status Status) Outage {
+	return Outage{ID: id, Status: status}
+}
+
+// Test that only outages with a targeted status are returned.
+func Test_FilterByStatus_Matching(t *testing.T) {
+	outages := []Outage{
+		statusOutage("a", StatusActive),
+		statusOutage("b", StatusFuture),
+		statusOutage("c", StatusResolved),
+	}
+
+	got := FilterByStatus(outages, []Status{StatusFuture})
+
+	assert.Equal(t, []Outage{statusOutage("b", StatusFuture)}, got)
+}
+
+// Test that all matching outages are returned across multiple targeted statuses.
+func Test_FilterByStatus_MultipleStatuses(t *testing.T) {
+	outages := []Outage{
+		statusOutage("a", StatusActive),
+		statusOutage("b", StatusFuture),
+		statusOutage("c", StatusResolved),
+	}
+
+	got := FilterByStatus(outages, []Status{StatusActive, StatusResolved})
+
+	assert.Equal(t, []Outage{statusOutage("a", StatusActive), statusOutage("c", StatusResolved)}, got)
+}
+
+// Test that no matching status returns an empty result.
+func Test_FilterByStatus_NoMatches(t *testing.T) {
+	outages := []Outage{
+		statusOutage("a", StatusActive),
+		statusOutage("b", StatusActive),
+	}
+
+	got := FilterByStatus(outages, []Status{StatusResolved})
+
+	assert.Empty(t, got)
+}
+
+// Test that an empty status list matches nothing.
+func Test_FilterByStatus_NoStatuses(t *testing.T) {
+	outages := []Outage{
+		statusOutage("a", StatusActive),
+		statusOutage("b", StatusFuture),
+	}
+
+	got := FilterByStatus(outages, []Status{})
+
+	assert.Empty(t, got)
+}
+
 // Test that a well-formed outage with nil times validates without error.
 func Test_Validate_Valid(t *testing.T) {
 	assert.NoError(t, validOutage().Validate())
