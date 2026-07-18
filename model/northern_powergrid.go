@@ -113,5 +113,5 @@ func NorthernPowergridToOutages(npos NorthernPowergridOutages) []Outage {
 			outages[k] = npo.ToOutage()
 		}
 	}
-	return slices.Collect(maps.Values(outages))
+	return slices.AppendSeq(make([]Outage, 0, len(outages)), maps.Values(outages))
 }

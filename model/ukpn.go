@@ -116,10 +116,9 @@ func (ukpno UKPowerNetworkOutage) status() Status {
 }
 
 func UKPowerNetworkToOutages(ukpnos UKPowerNetworkOutages) []Outage {
-	var outages []Outage
-
-	for _, outage := range ukpnos {
-		outages = append(outages, outage.ToOutage())
+	outages := make([]Outage, len(ukpnos))
+	for i, outage := range ukpnos {
+		outages[i] = outage.ToOutage()
 	}
 
 	return outages
