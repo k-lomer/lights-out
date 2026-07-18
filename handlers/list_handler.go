@@ -99,6 +99,9 @@ func (lh ListHandler) getOutages(ctx context.Context, qp model.QueryParams) ([]m
 	// Return outages based on page size and page index.
 	startIndex := min(uint(len(totalOutages)), qp.PageSize*qp.PageIndex)
 	endIndex := min(uint(len(totalOutages)), qp.PageSize*(qp.PageIndex+1))
+	if endIndex < startIndex {
+		endIndex = uint(len(totalOutages))
+	}
 	pageOutages := totalOutages[startIndex:endIndex]
 	return pageOutages, nil
 }

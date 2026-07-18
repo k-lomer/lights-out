@@ -9,6 +9,7 @@ import (
 	"github.com/k-lomer/lights-out/cache"
 	"github.com/k-lomer/lights-out/model"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 // Test the list handler with default params returns some outages.
@@ -77,6 +78,21 @@ func Test_ListHandler_AllOutages(t *testing.T) {
 	requireStatus(t, res.Code, http.StatusOK)
 	outages := decodeOutages(t, res.Body)
 	checkDnoOutages(t, outages, model.AllDnoList[:])
+}
+
+// Test the list handler with a large page index avoids overflow.
+func Test_ListHandler_PageIndexOverflow(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, "/list", nil)
+	addQueryParams(req, "pageSize", "1")
+	addQueryParams(req, "pageIndex", "18446744073709551615")
+	res := httptest.NewRecorder()
+
+	lh := NewListHandler(NewTestDnoClients(), cache.MakeOutageCache(time.Minute))
+	lh.ServeHTTP(res, req)
+
+	requireStatus(t, res.Code, http.StatusOK)
+	outages := decodeOutages(t, res.Body)
+	require.Empty(t, outages)
 }
 
 // Test the postcode filter.
