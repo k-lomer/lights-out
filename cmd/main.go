@@ -38,10 +38,10 @@ func main() {
 		model.DnoUKPowerNetwork:           clients.MakeUKPowerNetworkClient(client),
 	}
 
-	cache := cache.MakeOutageCache(10 * time.Minute)
+	outageCache := cache.MakeOutageCache(10 * time.Minute)
 
 	mux := http.NewServeMux()
-	lh := handlers.NewListHandler(dnoClients, cache)
+	lh := handlers.NewListHandler(dnoClients, outageCache)
 
 	mux.Handle("GET /list", lh)
 	s := http.Server{
