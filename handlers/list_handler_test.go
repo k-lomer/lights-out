@@ -350,6 +350,32 @@ func Test_ListHandler_PartialFailure(t *testing.T) {
 	})
 }
 
+// Test that a panicking DNO client is recovered and the others still return 200.
+func Test_ListHandler_ClientPanicRecovered(t *testing.T) {
+	dnoClients := NewTestDnoClients()
+	dnoClients[model.DnoSPEnergy] = NewPanickingTestDnoClient(model.DnoSPEnergy, errors.New("boom"))
+
+	req := httptest.NewRequest(http.MethodGet, "/list", nil)
+	addQueryParams(req, "pageSize", "0")
+	res := httptest.NewRecorder()
+
+	lh := NewListHandler(dnoClients, cache.MakeOutageCache(time.Minute))
+	lh.ServeHTTP(res, req)
+
+	requireStatus(t, res.Code, http.StatusOK)
+	outages := decodeOutages(t, res.Body)
+	for _, o := range outages {
+		assert.NotEqual(t, model.DnoSPEnergy, o.DNO)
+	}
+	checkDnoOutages(t, outages, []model.Dno{
+		model.DnoEnergyNorthWest,
+		model.DnoNationalGridDistribution,
+		model.DnoNorthernPowergrid,
+		model.DnoSse,
+		model.DnoUKPowerNetwork,
+	})
+}
+
 func Test_ListHandler_Caching(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/list", nil)
 	res := httptest.NewRecorder()

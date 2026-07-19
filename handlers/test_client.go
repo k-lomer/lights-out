@@ -15,6 +15,7 @@ type TestDnoClient struct {
 	Dno        model.Dno
 	NumOutages int
 	Err        error // If set, ListOutages returns it instead of outages.
+	Panic      any   // If set, ListOutages panics with it.
 }
 
 func NewTestDnoClient(dno model.Dno, numOutages int) TestDnoClient {
@@ -33,11 +34,22 @@ func NewFailingTestDnoClient(dno model.Dno, err error) TestDnoClient {
 	}
 }
 
+func NewPanickingTestDnoClient(dno model.Dno, v any) TestDnoClient {
+	return TestDnoClient{
+		UpdateTracker: &clients.UpdateTracker{},
+		Dno:           dno,
+		Panic:         v,
+	}
+}
+
 func (t TestDnoClient) GetDno() model.Dno {
 	return t.Dno
 }
 
 func (t TestDnoClient) ListOutages(ctx context.Context) ([]model.Outage, error) {
+	if t.Panic != nil {
+		panic(t.Panic)
+	}
 	if t.Err != nil {
 		return nil, t.Err
 	}
