@@ -14,6 +14,7 @@ type TestDnoClient struct {
 	*clients.UpdateTracker
 	Dno        model.Dno
 	NumOutages int
+	Err        error // If set, ListOutages returns it instead of outages.
 }
 
 func NewTestDnoClient(dno model.Dno, numOutages int) TestDnoClient {
@@ -24,11 +25,23 @@ func NewTestDnoClient(dno model.Dno, numOutages int) TestDnoClient {
 	}
 }
 
+func NewFailingTestDnoClient(dno model.Dno, err error) TestDnoClient {
+	return TestDnoClient{
+		UpdateTracker: &clients.UpdateTracker{},
+		Dno:           dno,
+		Err:           err,
+	}
+}
+
 func (t TestDnoClient) GetDno() model.Dno {
 	return t.Dno
 }
 
 func (t TestDnoClient) ListOutages(ctx context.Context) ([]model.Outage, error) {
+	if t.Err != nil {
+		return nil, t.Err
+	}
+
 	outages := make([]model.Outage, 0, t.NumOutages)
 	lastUpdated := time.Now().UTC()
 	for i := range t.NumOutages {

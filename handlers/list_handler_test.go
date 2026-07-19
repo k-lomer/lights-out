@@ -1,12 +1,14 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
 
 	"github.com/k-lomer/lights-out/cache"
+	"github.com/k-lomer/lights-out/clients"
 	"github.com/k-lomer/lights-out/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -302,6 +304,50 @@ func Test_ListHandler_StatusNoneTargeted(t *testing.T) {
 	lh.ServeHTTP(res, req)
 
 	requireStatus(t, res.Code, http.StatusBadRequest)
+}
+
+// Test that a 500 is returned only when every targeted DNO fails.
+func Test_ListHandler_AllDnosFail(t *testing.T) {
+	dnoClients := map[model.Dno]clients.DnoClient{}
+	for _, dno := range model.AllDnoList {
+		dnoClients[dno] = NewFailingTestDnoClient(dno, errors.New("boom"))
+	}
+
+	req := httptest.NewRequest(http.MethodGet, "/list", nil)
+	res := httptest.NewRecorder()
+
+	lh := NewListHandler(dnoClients, cache.MakeOutageCache(time.Minute))
+	lh.ServeHTTP(res, req)
+
+	requireStatus(t, res.Code, http.StatusInternalServerError)
+}
+
+// Test that a partial failure still returns 200 with only the healthy DNOs.
+func Test_ListHandler_PartialFailure(t *testing.T) {
+	dnoClients := NewTestDnoClients()
+	failed := []model.Dno{model.DnoSPEnergy, model.DnoSse}
+	for _, dno := range failed {
+		dnoClients[dno] = NewFailingTestDnoClient(dno, errors.New("boom"))
+	}
+
+	req := httptest.NewRequest(http.MethodGet, "/list", nil)
+	addQueryParams(req, "pageSize", "0")
+	res := httptest.NewRecorder()
+
+	lh := NewListHandler(dnoClients, cache.MakeOutageCache(time.Minute))
+	lh.ServeHTTP(res, req)
+
+	requireStatus(t, res.Code, http.StatusOK)
+	outages := decodeOutages(t, res.Body)
+	for _, o := range outages {
+		assert.NotContains(t, failed, o.DNO)
+	}
+	checkDnoOutages(t, outages, []model.Dno{
+		model.DnoEnergyNorthWest,
+		model.DnoNationalGridDistribution,
+		model.DnoNorthernPowergrid,
+		model.DnoUKPowerNetwork,
+	})
 }
 
 func Test_ListHandler_Caching(t *testing.T) {
