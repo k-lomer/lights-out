@@ -56,7 +56,7 @@ func (client SPEnergyClient) getOutageCount(ctx context.Context) (int, error) {
 	}
 	err = json.NewDecoder(res.Body).Decode(&result)
 	if err != nil {
-		return 0, err
+		return 0, fmt.Errorf("decode %s response: %w", client.GetDno(), err)
 	}
 	return result.Count, nil
 }
@@ -84,7 +84,7 @@ func (client SPEnergyClient) getOutages(ctx context.Context, count int) (*model.
 	var outages model.SPEnergyOutages
 	err = json.NewDecoder(res.Body).Decode(&outages)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("decode %s response: %w", client.GetDno(), err)
 	}
 
 	return &outages, nil

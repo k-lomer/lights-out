@@ -48,7 +48,7 @@ func (client SseClient) ListOutages(ctx context.Context) ([]model.Outage, error)
 	var liveOutages model.SseOutages
 	err = json.NewDecoder(res.Body).Decode(&liveOutages)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("decode %s response: %w", client.GetDno(), err)
 	}
 
 	ret := liveOutages.ToOutages()

@@ -83,7 +83,7 @@ func (client EnergyNorthWestClient) getOutages(ctx context.Context, pageSize int
 	var outages model.EnergyNorthWestOutages
 	err = json.NewDecoder(res.Body).Decode(&outages)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("decode %s response: %w", client.GetDno(), err)
 	}
 
 	return &outages, nil

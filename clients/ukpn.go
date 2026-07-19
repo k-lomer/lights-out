@@ -52,7 +52,7 @@ func (client UKPowerNetworkClient) ListOutages(ctx context.Context) ([]model.Out
 	var outages model.UKPowerNetworkOutages
 	err = json.NewDecoder(res.Body).Decode(&outages)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("decode %s response: %w", client.GetDno(), err)
 	}
 
 	ret := model.UKPowerNetworkToOutages(outages)

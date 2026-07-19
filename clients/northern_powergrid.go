@@ -48,7 +48,7 @@ func (client NorthernPowergridClient) ListOutages(ctx context.Context) ([]model.
 	var outages model.NorthernPowergridOutages
 	err = json.NewDecoder(res.Body).Decode(&outages)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("decode %s response: %w", client.GetDno(), err)
 	}
 
 	ret := model.NorthernPowergridToOutages(outages)

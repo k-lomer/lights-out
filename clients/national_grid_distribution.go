@@ -48,7 +48,7 @@ func (client NationalGridDistributionClient) ListOutages(ctx context.Context) ([
 	var outages model.NationalGridOutages
 	err = json.NewDecoder(res.Body).Decode(&outages)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("decode %s response: %w", client.GetDno(), err)
 	}
 
 	ret := outages.ToOutages()
